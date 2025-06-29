@@ -104,6 +104,10 @@ program
 async function copyTemplate(templatePath, targetPath, projectName, domainName) {
   const items = await fs.readdir(templatePath);
   
+  // Debug: Log all items found
+  console.log('📂 Files found in template:', items);
+  console.log('🔍 Hidden files:', items.filter(item => item.startsWith('.')));
+  
   for (const item of items) {
     const sourcePath = path.join(templatePath, item);
     const stat = await fs.stat(sourcePath);
@@ -121,7 +125,20 @@ async function copyTemplate(templatePath, targetPath, projectName, domainName) {
     } else {
       // Copy file and replace placeholders
       const targetItemPath = path.join(targetPath, item);
+      console.log(`📄 Copying file: ${item}`);
       await copyFileWithPlaceholders(sourcePath, targetItemPath, projectName, domainName);
+    }
+  }
+  
+  // Ensure critical hidden files are copied (double-check)
+  const criticalFiles = ['.gitignore', '.cursorrules'];
+  for (const file of criticalFiles) {
+    const sourcePath = path.join(templatePath, file);
+    const targetPath_file = path.join(targetPath, file);
+    
+    if (await fs.pathExists(sourcePath) && !(await fs.pathExists(targetPath_file))) {
+      console.log(`⚠️  Missing critical file ${file}, copying now...`);
+      await copyFileWithPlaceholders(sourcePath, targetPath_file, projectName, domainName);
     }
   }
 }

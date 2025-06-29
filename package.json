@@ -1,6 +1,6 @@
 {
   "name": "@amorphie/cli",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "CLI tool for creating Amorphie template projects",
   "main": "create.js",
   "bin": {

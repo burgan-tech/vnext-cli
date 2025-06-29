@@ -24,10 +24,10 @@
     "{packageName}",
     "{domainName}"
   ],
-  "author": "",
+  "author": "{domainName} Team",
   "license": "MIT",
   "dependencies": {
-    "@amorphie/core": "^1.0.0"
+    "@amorphie/definition-core": "^1.0.0"
   },
   "devDependencies": {
     "ajv": "^8.12.0",
