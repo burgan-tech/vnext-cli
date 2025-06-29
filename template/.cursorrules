@@ -1,0 +1,119 @@
+# {domainName} Domain Project Rules for Cursor AI
+
+## Project Structure Rules
+- Every folder represents a workflow (Schema, View, Task, Function, etc.)
+- Files inside folders are instances of that workflow
+- All files must follow semantic versioning: `[name].[Version].json` (e.g., `task-example.1.0.0.json`)
+
+### File Naming Convention (Linter Rule)
+- Definition file names MUST be composed of: `key` + `.` + `version` + `.json`
+- The filename must exactly match the combination of the definition's `key` attribute and `version` attribute
+- Example: If key="schema" and version="1.0.0", filename must be `schema.1.0.0.json`
+- This ensures consistency and enables automated validation/linting
+
+## Schema Instance Pattern Rules
+
+### Platform Managed Properties (InstanceBase)
+- Schema instances MUST include: `key`, `version`, `domain`, `flow`, `flowVersion`, `tags`
+- Schema instances MUST NOT include: `labels` (labels belong to business logic)
+- Optional fields: `id`, `eTag` (added by platform in production)
+
+### Business Process Properties
+- State, Transition, Workflow definitions inside attributes MUST include `labels`
+- View instances MAY include `labels` in attributes
+- Use label.1.0.0.json#/attributes reference for i18n support
+- Payload example {"label": "Example", "language": "en-US"}
+
+## Reference Pattern Rules
+
+### Foreign Key Pattern
+- References use: `domain` + `workflow` + (`id` OR `key`) + optional `version`
+- NO `type` property in references - `workflow` field serves as type
+- Examples:
+  - Schema → workflow: "Schema"
+  - View → workflow: "View"
+  - Task → workflow: "Task"
+
+### Reference Format
+- Always use local file references: `reference.1.0.0.json#/attributes`
+- Never use: `https://schemas.amorphie.com/...`
+- Use `#/attributes` to reference the schema inside attributes
+
+## JSON Schema Standards
+
+### Enum Pattern
+Use oneOf + const + description instead of enum arrays:
+```json
+"oneOf": [
+  {"const": "value1", "description": "Description 1"},
+  {"const": "value2", "description": "Description 2"}
+]
+```
+
+### Required Properties
+- Always define required fields explicitly
+- State schema requires: `key`, `labels`, `transitions`, `views`, etc.
+- Transition schema requires: `key`, `labels`, `versionStrategy`, `onExecutionTask`, `type`
+
+## Workflow Lifecycle Pattern
+
+### Standard 3-State Pattern
+All lifecycle workflows must have:
+- `draft` (type: "start") - Initial state
+- `active` (type: "normal") - Active state
+- `passive` (type: "finish") - Final state
+
+### Standard Transitions
+- `create-*` → Entry to draft
+- `activate` → draft to active
+- `delete` → Delete in draft
+- `deactivate` → active to passive
+- `update` → Update in active
+- `reactivate` → passive to active
+- `archive` → Archive in passive
+
+### modelSchema References
+All workflows reference schemas in Schema workflow:
+```json
+"modelSchema": {
+  "key": "reference",
+  "domain": "core",
+  "workflow": "schema",  // Always points to Schema workflow
+  "version": "1.0.0"
+}
+```
+
+## Task Array Pattern
+For onEntries, onExits:
+```json
+{
+  "order": 1,
+  "task": { "$ref": "reference.1.0.0.json#/attributes" },
+  "mapping": { "$ref": "mapping.1.0.0.json#/attributes" }
+}
+```
+
+## Common Mistakes to Avoid
+
+### ❌ DON'T
+- Add labels to schema instances
+- Add type property to references
+- Use https://schemas.amorphie.com URLs
+- Create files without version numbers
+- Add non-existent properties (permissions, conditions, metadata to State)
+- Use simple object definitions instead of schema references
+
+### ✅ DO
+- Keep schema instances platform-managed only
+- Use workflow field as type indicator in references
+- Use local file references with #/attributes
+- Follow semantic versioning for all files
+- Reference code.1.0.0.json for mapping properties
+- Read original files before making changes
+
+## Development Guidelines
+- Schema-first approach
+- Semantic versioning for backward compatibility
+- JSON Schema Draft 2020-12 compliance
+- Cross-domain ready architecture
+- Instance wrapper pattern for schema definitions 

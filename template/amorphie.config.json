@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "description": "{domainName} Domain Definition Configuration",
+  "domain": "{domainName}",
+  "paths": {
+      "componentsRoot": "{domainName}",
+      "tasks": "Tasks",
+      "views": "Views",
+      "functions": "Functions",
+      "extensions": "Extensions",
+      "workflows": "Workflows",
+      "schemas": "Schemas"
+  },
+  "validation": {
+      "enabled": true,
+      "autoScan": true,
+      "includePatterns": [
+          "**/*.json"
+      ],
+      "excludePatterns": [
+          "**/node_modules/**",
+          "**/package*.json",
+          "**/.git/**",
+          "**/dist/**",
+          "**/build/**",
+          "**/coverage/**",
+          "**/.vscode/**",
+          "**/.ajv-*/**",
+          "**/ajv-*/**",
+          "**/.tmp/**",
+          "**/tmp/**",
+          "**/genDocs/**"
+      ]
+  },
+  "linting": {
+      "enabled": true,
+      "rules": {
+          "filename-consistency": true,
+          "reference-integrity": true,
+          "version-consistency": true,
+          "label-completeness": true,
+          "state-machine-validation": true,
+          "schema-validation": true
+      },
+      "requiredLanguages": [
+          "en-US",
+          "tr-TR"
+      ],
+      "allowedWorkflowTypes": [
+          "Schema",
+          "Workflow",
+          "Task",
+          "View",
+          "Function",
+          "Extension"
+      ]
+  },
+  "schemas": {
+      "autoDetection": true,
+      "mappings": {
+          "sys-tasks": "task-definition.schema.json",
+          "sys-views": "view-definition.schema.json",
+          "sys-functions": "function-definition.schema.json",
+          "sys-extensions": "extension-definition.schema.json",
+          "sys-flows": "workflow-definition.schema.json",
+          "sys-schemas": "schema-definition.schema.json"
+      }
+  },
+  "setup": {
+      "createFolders": true,
+      "updateVSCodeSettings": true,
+      "examples": {
+          "createSample": false,
+          "domain": "{domainName}"
+      }
+  }
+}
