@@ -33,10 +33,6 @@
     {
       "fileMatch": ["**/{domainName}/Tasks/*.json"],
       "url": "./.vscode/schemas/task-definition.schema.json"
-    },
-    {
-      "fileMatch": ["**/amorphie.config.json"],
-      "url": "./.vscode/schemas/core-schema.schema.json"
     }
   ],
   

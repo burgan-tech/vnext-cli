@@ -19,6 +19,12 @@ create-amorphie-app
 # With project name - will prompt for domain name
 create-amorphie-app my-project
 
+# Full command name - same as create-amorphie-app
+amorphie my-project
+
+# Short alias for the CLI
+amp my-project
+
 # Using npx (no global installation needed)
 npx @amorphie/cli my-project
 ```
