@@ -112,7 +112,7 @@
   "problemMatchers": {
     "{domainName}-linter": {
       "owner": "{domainName}-linter",
-      "fileLocation": ["relative", "${workspaceFolder}"],
+      "fileLocation": ["relative", "${workspaceFolder}/{domainName}"],
       "pattern": [
         {
           "regexp": "^(.+?):(\\d+):(\\d+):\\s+(error|warning|info)\\s+(.+)$",
@@ -126,7 +126,7 @@
     },
     "{domainName}-validator": {
       "owner": "{domainName}-validator",
-      "fileLocation": ["relative", "${workspaceFolder}"],
+      "fileLocation": ["relative", "${workspaceFolder}/{domainName}"],
       "pattern": [
         {
           "regexp": "^✗ (.*)$",
