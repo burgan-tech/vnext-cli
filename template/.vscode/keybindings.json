@@ -1,0 +1,62 @@
+[
+  {
+    "key": "cmd+shift+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Validate {domainName} Component",
+    "when": "isMac && editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Validate {domainName} Component",
+    "when": "!isMac && editorTextFocus"
+  },
+  {
+    "key": "cmd+shift+alt+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Validate All {domainName} Components",
+    "when": "isMac"
+  },
+  {
+    "key": "ctrl+shift+alt+v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Validate All {domainName} Components",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Create {domainName} Component",
+    "when": "isMac"
+  },
+  {
+    "key": "ctrl+shift+c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Create {domainName} Component",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Lint {domainName} Domain",
+    "when": "isMac"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Lint {domainName} Domain",
+    "when": "!isMac"
+  },
+  {
+    "key": "cmd+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Run Tests",
+    "when": "isMac"
+  },
+  {
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Run Tests",
+    "when": "!isMac"
+  }
+] 
