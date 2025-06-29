@@ -58,7 +58,6 @@ my-project/
 │   ├── amorphie.code-snippets      # VSCode code snippets
 │   ├── settings.json               # Workspace settings
 │   ├── tasks.json                  # Custom VSCode tasks
-│   ├── keybindings.json           # Keyboard shortcuts
 │   └── lint.config.json           # Linting configuration
 ├── amorphie.config.json            # Domain configuration
 ├── .cursorrules                    # AI assistant rules
@@ -83,7 +82,6 @@ my-project/
 ### 📝 VSCode Integration
 - **Custom Tasks**: Validate, lint, and create components via command palette
 - **Code Snippets**: Pre-built templates for all component types
-- **Keyboard Shortcuts**: Quick access to common operations
 - **Problem Matching**: Integrated error reporting and navigation
 
 ### 🤖 AI Assistant Support
@@ -124,12 +122,14 @@ npm run build            # Build with pre-validation
 
 ### Code Snippets
 Type these prefixes in VSCode and press Tab:
-- `amorphie-workflow` - Create workflow component
-- `amorphie-function` - Create function component  
-- `amorphie-view` - Create view component
-- `amorphie-schema` - Create schema component
-- `amorphie-task` - Create task component
-- `amorphie-extension` - Create extension component
+- **`workflow-basic`**: Basic workflow structure
+- **`instance-basic`**: Instance definition
+- **`view-def`**: View component
+- **`extension-def`**: Extension definition
+- **`schema-def`**: Schema definition
+- **`state-*`**: All state types
+- **`transition-*`**: All transition types
+- **`task-*`**: All task types
 
 ## 📖 Usage Examples
 
@@ -150,7 +150,7 @@ Type these prefixes in VSCode and press Tab:
 
 ### Component Naming
 ```bash
-# Pattern: {type}-{description}.{version}.json
+# Pattern: {type}-{key}.{version}.json
 workflow-user-registration.1.0.0.json
 function-calculate-tax.1.0.0.json
 view-dashboard-summary.1.0.0.json

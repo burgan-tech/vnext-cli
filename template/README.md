@@ -74,7 +74,6 @@ npm run dev
 │   ├── amorphie.code-snippets       # Code snippets for components
 │   ├── settings.json                # Workspace settings
 │   ├── tasks.json                   # Custom VSCode tasks
-│   ├── keybindings.json            # Custom keyboard shortcuts
 │   └── lint.config.json            # Linting configuration
 ├── amorphie.config.json             # Project configuration
 ├── .cursorrules                     # Cursor AI assistant rules
@@ -224,7 +223,7 @@ The project includes comprehensive code snippets for rapid development:
 The project includes custom tasks for development automation:
 
 #### Validation Tasks:
-- **Validate Component** (`Cmd+Shift+V`): Validate the currently open component
+- **Validate Component**: Validate the currently open component
 - **Validate All Components**: Validate all components in the domain
 - **Lint All Components**: Lint all domain components
 
@@ -234,11 +233,6 @@ The project includes custom tasks for development automation:
 - **Watch CSX Changes**: Watch for CSX file changes and auto-update
 - **Create Mapping CSX**: Create new CSX mapping file
 - **Create Rule CSX**: Create new CSX rule file
-
-### Keyboard Shortcuts (`keybindings.json`)
-
-- **`Cmd+Shift+V`** (Mac) / **`Ctrl+Shift+V`** (Windows): Validate current component
-- **`Cmd+Shift+L`** (Mac) / **`Ctrl+Shift+L`** (Windows): Lint current component
 
 ### Workspace Settings
 
