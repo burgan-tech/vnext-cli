@@ -1,0 +1,26 @@
+{
+  "key": "available-transitions",
+  "version": "1.0.0",
+  "domain": "{domainName}",
+  "flow": "sys-extensions",
+  "flowVersion": "1.0.0",
+  "tags": [
+    "{domainName}",
+    "sys-extensions",
+    "components"
+  ],
+  "attributes": {
+    "type": 1,
+    "scope": 1,
+    "task": {
+      "order": 1,
+      "task": {
+        "$ref": "Tasks/available-transitions.1.0.0.json"
+      },
+      "mapping": {
+        "location": "./src/AvailableTransitionMapping.csx",
+        "code": "dXNpbmcgU3lzdGVtOwp1c2luZyBTeXN0ZW0uVGhyZWFkaW5nLlRhc2tzOwp1c2luZyBCQlQuV29ya2Zsb3cuRGVmaW5pdGlvbnM7CgpuYW1lc3BhY2UgQkJULldvcmtmbG93LlNjcmlwdGluZzsKCnB1YmxpYyBjbGFzcyBBdmFpbGFibGVUcmFuc2l0aW9uTWFwcGluZyA6IElNYXBwaW5nCnsKICBwdWJsaWMgVGFzazxTY3JpcHRSZXNwb25zZT4gSW5wdXRIYW5kbGVyKFdvcmtmbG93VGFzayB0YXNrLCBTY3JpcHRDb250ZXh0IGNvbnRleHQpCiAgewogICAgdmFyIGRhcHJUYXNrID0gdGFzayBhcyBEYXByU2VydmljZVRhc2s7CiAgICB2YXIgZW52aXJvbm1lbnQgPSBFbnZpcm9ubWVudC5HZXRFbnZpcm9ubWVudFZhcmlhYmxlKCJBU1BORVRDT1JFX0VOVklST05NRU5UIik7CgogICAgaWYgKGVudmlyb25tZW50ID09ICJEZXZlbG9wbWVudCIpCiAgICB7CiAgICAgIC8vIExvY2FsIGRldmVsb3BtZW50CiAgICAgIGRhcHJUYXNrLlNldEFwcElkKCJ2bmV4dC1hcHAiKTsKICAgIH0KICAgIGVsc2UKICAgIHsKICAgICAgZGFwclRhc2suU2V0QXBwSWQoJCJhbW9ycGhpZS12bmV4dC57ZW52aXJvbm1lbnQuVG9Mb3dlcigpfS1hbW9ycGhpZS12bmV4dCIpOwogICAgfQoKICAgIHZhciBtZXRob2ROYW1lID0gZGFwclRhc2shLk1ldGhvZE5hbWUKICAgICAgICAuUmVwbGFjZSgie2RvbWFpbn0iLCBjb250ZXh0LlJ1bnRpbWUuRG9tYWluKQogICAgICAgIC5SZXBsYWNlKCJ7d29ya2Zsb3d9IiwgY29udGV4dC5Xb3JrZmxvdy5LZXkpCiAgICAgICAgLlJlcGxhY2UoIntpbnN0YW5jZX0iLCBjb250ZXh0Lkluc3RhbmNlLktleSk7CiAgICBkYXByVGFzay5TZXRNZXRob2ROYW1lKG1ldGhvZE5hbWUgKyAkIj92ZXJzaW9uPXtjb250ZXh0LldvcmtmbG93LlZlcnNpb259Iik7CiAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KG5ldyBTY3JpcHRSZXNwb25zZSgpKTsKICB9CgogIHB1YmxpYyBUYXNrPFNjcmlwdFJlc3BvbnNlPiBPdXRwdXRIYW5kbGVyKFNjcmlwdENvbnRleHQgY29udGV4dCkKICB7CiAgICByZXR1cm4gVGFzay5Gcm9tUmVzdWx0KG5ldyBTY3JpcHRSZXNwb25zZQogICAgewogICAgICBEYXRhID0gbmV3CiAgICAgIHsKICAgICAgICBpdGVtcyA9IGNvbnRleHQuQm9keT8uZGF0YT8uaXRlbXMsCiAgICAgICAgc3RhdHVzID0gY29udGV4dC5Cb2R5Py5kYXRhPy5zdGF0dXMsCiAgICAgICAgY3VycmVudFN0YXRlID0gY29udGV4dC5Cb2R5Py5kYXRhPy5jdXJyZW50U3RhdGUKICAgICAgfQogICAgfSk7CiAgfQp9Cg=="
+      }
+    }
+  }
+}

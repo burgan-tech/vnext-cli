@@ -93,7 +93,7 @@
                     "required": [
                         "key",
                         "domain",
-                        "workflow",
+                        "flow",
                         "version"
                     ],
                     "properties": {
@@ -105,7 +105,7 @@
                             "type": "string",
                             "description": "Task domain"
                         },
-                        "workflow": {
+                        "flow": {
                             "type": "string",
                             "description": "Task workflow",
                             "const": "sys-tasks"

@@ -1,248 +1,489 @@
-# @amorphie/cli
+# Amorphie CLI
 
-Modern CLI tool for creating domain-driven Amorphie projects with comprehensive development tooling and VSCode integration.
+Modern CLI tool for creating and managing modular, domain-driven Amorphie projects with NPM-based component sharing and reference resolution.
 
 ## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-npm install -g @amorphie/cli
+npm install -g amorphie-cli
 ```
 
-### Create a New Project
+### Create a New Domain Project
 
 ```bash
 # Interactive mode - prompts for project and domain names
-create-amorphie-app
+amorphie create
+# or use the short form
+amp create
 
-# With project name - will prompt for domain name
-create-amorphie-app my-project
-
-# Full command name - same as create-amorphie-app
-amorphie my-project
-
-# Short alias for the CLI
-amp my-project
+# With project name - will prompt for domain name  
+amorphie create my-domain-project
+amp create my-domain-project
 
 # Using npx (no global installation needed)
-npx @amorphie/cli my-project
+npx amorphie-cli create my-domain-project
 ```
 
-## 📋 What It Does
+> 💡 **Tip:** You can use `amp` as a shorthand for `amorphie` in all commands for faster development.
 
-The CLI creates a **domain-driven** Amorphie project with:
+## 🏗️ Modular Domain Architecture
 
-✅ **Domain-based architecture** with structured component directories  
-✅ **VSCode workspace** with development scripts and validation tools  
-✅ **JSON Schema validation** for all component types  
-✅ **Automated linting** and validation workflows  
-✅ **Code snippets** and development automation  
-✅ **AI assistant rules** for Cursor/VSCode  
+The Amorphie CLI implements a **modular, schema-based, configuration-controlled domain sharing** system where:
 
-## 🏗️ Project Structure
+✅ **Dual Package Strategy**: Each domain publishes two NPM packages:
+   - **Reference Package**: `@amorphie/domain-identity-reference` (for cross-domain usage)
+   - **Runtime Package**: `@amorphie/domain-identity-runtime` (for engine deployment)
+✅ **Export control** through `amorphie.config.json` - domains expose only what they want to share  
+✅ **Reference resolution** using `$ref` patterns for cross-domain component usage  
+✅ **Schema validation** ensures interface compatibility between domains  
+✅ **Build-time reference replacement** - converts `$ref` to deployment-ready payloads  
+✅ **NPM-based distribution** with semantic versioning and caching  
 
-After running the CLI, you'll get:
+## 📋 Project Structure
+
+After running `amorphie create`, you'll get:
 
 ```
-my-project/
-├── your-domain/                    # Domain directory (e.g., user-management)
+my-domain-project/
+├── your-domain/                    # Domain components directory
 │   ├── Workflows/                  # Business process workflows  
+│   │   └── sys-flows.1.0.0.json   # Example with $ref usage
 │   ├── Functions/                  # Serverless functions
 │   ├── Views/                      # UI components and views
 │   ├── Extensions/                 # Custom framework extensions
 │   ├── Schemas/                    # Data models and schemas
 │   └── Tasks/                      # Background tasks and jobs
-├── .vscode/                        # VSCode workspace configuration
-│   ├── scripts/                    # Development automation scripts
-│   │   ├── validate-component.js   # Component validation
-│   │   ├── lint-domain.js          # Domain linting
-│   │   ├── create-code-file.js     # Component creation
-│   │   ├── update-workflow-csx.js  # CSX rule management
-│   │   └── watch-workflows-csx.js  # File watching
-│   ├── schemas/                    # JSON schemas for validation
-│   ├── amorphie.code-snippets      # VSCode code snippets
-│   ├── settings.json               # Workspace settings
-│   ├── tasks.json                  # Custom VSCode tasks
-│   └── lint.config.json           # Linting configuration
-├── amorphie.config.json            # Domain configuration
-├── .cursorrules                    # AI assistant rules
-├── package.json                    # Project dependencies
+│       └── task-invalidate-cache.1.0.0.json
+├── amorphie.config.json            # Domain configuration with exports
+├── package.json                    # NPM package configuration
 └── README.md                       # Project documentation
 ```
 
-## ⚙️ Features
+## ⚙️ Core Features
 
-### 🎯 Domain-Driven Development
-- **Domain Organization**: Structure your project around business domains
-- **Domain Validation**: Ensure consistency across domain components
-- **Semantic Versioning**: All components follow `name.version.json` pattern
-- **Cross-Domain References**: Validate references between domains
+### 🎯 Export-Controlled Domain Sharing
 
-### 🛠️ Development Tools
-- **Component Validation**: JSON schema validation for all component types
-- **Domain Linting**: Custom rules for filename consistency and business logic
-- **Auto-generation**: Create components with proper naming and structure
-- **File Watching**: Automatic validation and CSX rule updates
+Control what your domain exposes through `amorphie.config.json`:
 
-### 📝 VSCode Integration
-- **Custom Tasks**: Validate, lint, and create components via command palette
-- **Code Snippets**: Pre-built templates for all component types
-- **Problem Matching**: Integrated error reporting and navigation
-
-### 🤖 AI Assistant Support
-- **Cursor Rules**: Domain-specific AI assistance rules
-- **Schema Patterns**: Guidance for proper JSON schema usage
-- **Best Practices**: Built-in development guidelines
-
-## 🔧 Available Scripts
-
-Once your project is created, use these npm scripts:
-
-```bash
-# Validation
-npm run validate          # Validate current component
-npm run validate:all      # Validate all domain components
-npm run validate:verbose  # Detailed validation output
-
-# Linting
-npm run lint             # Lint domain files
-npm run lint:domain      # Domain-specific linting
-npm run lint:verbose     # Detailed linting output
-
-# Development
-npm test                 # Run domain linting tests
-npm run build            # Build with pre-validation
-```
-
-## 🎨 VSCode Tasks & Shortcuts
-
-### Quick Access Tasks
-- **Ctrl/Cmd + Shift + P** → "Tasks: Run Task" to access:
-  - `Validate Component` - Validate current file
-  - `Validate All Components` - Validate entire domain
-  - `Lint All Components` - Run domain linting
-  - `Create Mapping CSX` - Create workflow mapping
-  - `Update Current CSX` - Update workflow rules
-  - `Watch CSX Files` - Auto-update workflow files
-
-### Code Snippets
-Type these prefixes in VSCode and press Tab:
-- **`workflow-basic`**: Basic workflow structure
-- **`instance-basic`**: Instance definition
-- **`view-def`**: View component
-- **`extension-def`**: Extension definition
-- **`schema-def`**: Schema definition
-- **`state-*`**: All state types
-- **`transition-*`**: All transition types
-- **`task-*`**: All task types
-
-## 📖 Usage Examples
-
-### Domain Name Guidelines
-```bash
-✅ Valid domain names:
-- core
-- user-management  
-- billing-system
-- analytics-engine
-
-❌ Invalid domain names:
-- UserManagement (no uppercase)
-- user_management (no underscores)
-- -user-mgmt (no leading hyphens)
-- user-mgmt- (no trailing hyphens)
-```
-
-### Component Naming
-```bash
-# Pattern: {type}-{key}.{version}.json
-workflow-user-registration.1.0.0.json
-function-calculate-tax.1.0.0.json
-view-dashboard-summary.1.0.0.json
-schema-customer-profile.1.0.0.json
-task-daily-cleanup.1.0.0.json
-extension-audit-logger.1.0.0.json
-```
-
-## 🔍 Configuration
-
-### amorphie.config.json
 ```json
 {
-  "domain": "your-domain",
+  "domain": "identity",
   "version": "1.0.0",
+  "exports": {
+    "functions": [
+      "calculate-credit-score.1.0.0.json",
+      "generate-user-id.1.1.0.json"
+    ],
+    "workflows": [
+      "user-registration.1.0.0.json"
+    ],
+    "tasks": [
+      "task-invalidate-cache.1.0.0.json"
+    ],
+    "visibility": "public",
+    "metadata": {
+      "description": "Identity management components",
+      "maintainer": "Identity Team"
+    }
+  },
+  "dependencies": {
+    "domains": ["@amorphie/domain-core-reference"],
+    "npm": []
+  }
+}
+```
+
+### 🔗 Reference Resolution System
+
+Use `$ref` to reference components across domains:
+
+```json
+{
+  "key": "start-onboarding",
+  "domain": "onboarding", 
+  "tasks": [
+    {
+      "$ref": "@amorphie/domain-core-reference/Tasks/task-invalidate-cache.1.0.0.json"
+    },
+    {
+      "$ref": "Tasks/local-task.1.0.0.json"
+    }
+  ]
+}
+```
+
+**Local references:** `Tasks/task-name.1.0.0.json`  
+**External references:** `@amorphie/domain-core-reference/Tasks/task-name.1.0.0.json`
+
+> **Package Naming**: Reference packages use `-reference` suffix for cross-domain usage
+
+## 🛠️ CLI Commands
+
+### Domain Management
+
+```bash
+# Create new domain project
+amorphie create [project-name]
+amp create [project-name]                # Short form
+
+# Validate domain components and resolve references
+amorphie validate --resolve-refs --strict
+amp validate --resolve-refs --strict     # Short form
+
+# Build packages for different purposes
+amorphie build                           # Default: reference build
+amorphie build --type reference          # For cross-domain usage
+amorphie build --type runtime            # For engine deployment
+amp build --type runtime                 # Short form
+amorphie build --skip-validation         # Skip validation if needed
+
+# Publish packages to NPM
+amorphie publish --dry-run               # Test reference publish
+amorphie publish --type reference       # For cross-domain usage
+amorphie publish --type runtime         # For engine deployment
+amp publish --type runtime              # Short form
+amorphie publish --registry https://npm.amorphie.com
+```
+
+### Component Discovery
+
+```bash
+# List exports from current project
+amorphie list-exports
+amp list-exports                         # Short form
+
+# List exports from external domain package
+amorphie list-exports @amorphie/domain-core-reference
+amp list-exports @amorphie/domain-core-reference   # Short form
+
+# Generate domain boundary visualization
+amorphie visualize-boundaries -f mermaid -o boundaries.md
+amp visualize-boundaries -f mermaid -o boundaries.md    # Short form
+amorphie visualize-boundaries -f json -o dependencies.json
+```
+
+## 🔍 Reference Resolution & Validation
+
+### Validate with Reference Resolution
+
+```bash
+# Validate all JSON files and resolve $ref references
+amorphie validate --resolve-refs
+amp validate --resolve-refs              # Short form
+
+# Enable strict mode validation
+amorphie validate --resolve-refs --strict
+amp validate --resolve-refs --strict     # Short form
+```
+
+**What happens during validation:**
+1. ✅ Scans all JSON files in your domain
+2. ✅ Finds `$ref` properties pointing to external components  
+3. ✅ Downloads referenced NPM packages to `.amorphie-cache`
+4. ✅ Checks if referenced components are exported by target domain
+5. ✅ Validates schema compatibility between versions
+6. ✅ Reports broken references and version conflicts
+
+### Example Validation Output
+
+```bash
+🔍 Validating domain components...
+📄 Validating: Workflows/sys-flows.1.0.0.json
+  ✅ Valid (3 refs resolved)
+📄 Validating: Tasks/task-invalidate-cache.1.0.0.json  
+  ✅ Valid (0 refs resolved)
+
+📊 Validation Summary:
+Files: 2/2 valid
+References: 3/3 resolved
+🎉 All validations passed!
+```
+
+## 📦 Building & Distribution 
+
+### Build Domain Package
+
+```bash
+# Reference build (default) - for cross-domain usage
+amorphie build                      # Default: reference build
+amorphie build --type reference     # Explicit reference build
+amp build --type reference         # Short form
+
+# Runtime build - for engine deployment
+amorphie build --type runtime       # Complete domain structure
+amp build --type runtime           # Short form
+
+# Custom options
+amorphie build -o custom-dist       # Custom output directory
+amorphie build --skip-validation    # Skip validation (not recommended)
+```
+
+#### Build Types
+
+**📦 Reference Build** (`--type reference`, default):
+- ✅ Only exported components (defined in `amorphie.config.json`)
+- ✅ Reference resolution: `$ref` → payload objects
+- ✅ Minimal package for cross-domain usage
+- ✅ Package name: `{original-name}-reference`
+- ✅ Other domains can npm install and reference
+
+**🚀 Runtime Build** (`--type runtime`):
+- ✅ Complete domain structure (all files and folders)
+- ✅ No reference resolution (preserves original `$ref`)
+- ✅ Package name: `{original-name}-runtime`
+- ✅ Ready for CI/CD deployment to engine
+- ✅ Includes internal components and supporting files
+
+#### Build Process
+1. **Validation**: All components validated with schema validation
+2. **Type Processing**: Reference vs Runtime handling
+3. **Output Generation**: Deployment-ready package created
+
+**Reference Resolution Example** (Reference Build Only):
+```json
+// Before build (development):
+{
+  "task": {
+    "$ref": "Tasks/task-invalidate-cache.1.0.0.json"
+  }
+}
+
+// After reference build (deployment-ready):
+{
+  "task": {
+    "key": "task-invalidate-cache",
+    "version": "1.0.0",
+    "domain": "core",
+    "flow": "sys-tasks"
+  }
+}
+
+// Runtime build preserves original $ref for engine processing
+```
+
+### Publish to NPM
+
+```bash
+# Publish reference package (default)
+amorphie publish --dry-run               # Test reference publish
+amorphie publish --type reference       # Explicit reference publish
+amp publish --type reference           # Short form
+
+# Publish runtime package
+amorphie publish --type runtime         # Complete runtime publish
+amp publish --type runtime             # Short form
+
+# Registry options
+amorphie publish --registry https://npm.amorphie.com
+amp publish --registry https://npm.amorphie.com    # Short form
+```
+
+**Publishing automatically builds the package with the specified type before publishing.**
+
+#### Package Naming Convention
+
+- **Reference Package**: `{your-package-name}-reference`
+- **Runtime Package**: `{your-package-name}-runtime`
+
+**Example**: If your `package.json` has `"name": "@amorphie/domain-identity"`, the published packages will be:
+- `@amorphie/domain-identity-reference` (for cross-domain usage)
+- `@amorphie/domain-identity-runtime` (for engine deployment)
+
+## 🗺️ Domain Boundary Visualization
+
+Generate visual representations of your domain dependencies:
+
+```bash
+# JSON format (default)
+amorphie visualize-boundaries
+amp visualize-boundaries                 # Short form
+
+# Mermaid diagram
+amorphie visualize-boundaries -f mermaid -o boundaries.md
+amp visualize-boundaries -f mermaid -o boundaries.md    # Short form
+
+# DOT format for Graphviz
+amorphie visualize-boundaries -f dot -o graph.dot
+amp visualize-boundaries -f dot -o graph.dot           # Short form
+```
+
+### Example Mermaid Output
+
+```mermaid
+graph TD
+  domain_core[@amorphie/domain-core]
+  domain_notifications[@amorphie/domain-notifications]
+  identity[identity]
+  
+  domain_core --> identity
+  domain_notifications --> identity
+```
+
+## 🔧 Advanced Configuration
+
+### Complete amorphie.config.json
+
+```json
+{
+  "version": "1.0.0",
+  "description": "Identity Domain Components",
+  "domain": "identity",
   "paths": {
-    "componentsRoot": "your-domain",
+    "componentsRoot": "identity",
+    "tasks": "Tasks",
     "workflows": "Workflows",
-    "functions": "Functions",
-    "views": "Views",
-    "extensions": "Extensions",
-    "schemas": "Schemas",
-    "tasks": "Tasks"
+    "functions": "Functions"
   },
-  "validation": {
-    "enabled": true,
-    "autoScan": true
+  "exports": {
+    "functions": ["calculate-risk.1.0.0.json"],
+    "workflows": ["user-flow.1.0.0.json"],
+    "tasks": ["cleanup-task.1.0.0.json"],
+    "visibility": "public",
+    "metadata": {
+      "description": "Identity management components",
+      "maintainer": "Identity Team",
+      "license": "MIT"
+    }
   },
-  "linting": {
+  "dependencies": {
+    "domains": ["@amorphie/domain-core-reference"],
+    "npm": ["lodash@4.17.21"]
+  },
+  "referenceResolution": {
     "enabled": true,
-    "rules": {
-      "filename-consistency": true,
-      "reference-integrity": true,
-      "schema-validation": true
+    "validateOnBuild": true,
+    "strictMode": true,
+    "validateReferenceConsistency": true,
+    "validateSchemas": true,
+    "allowedHosts": [
+      "registry.npmjs.org",
+      "npm.amorphie.com"
+    ],
+    "schemaValidationRules": {
+      "enforceKeyFormat": true,
+      "enforceVersionFormat": true,
+      "enforceFilenameConsistency": true,
+      "allowUnknownProperties": false
     }
   }
 }
 ```
 
-## 🚀 Next Steps
+## 💡 Best Practices
 
-After creating your project:
+### 1. Export Strategy
+```bash
+✅ Export stable, versioned components
+✅ Use semantic versioning (1.0.0, 1.1.0, 2.0.0)
+✅ Document breaking changes
+❌ Don't export internal/private components
+❌ Don't export components under active development
+```
 
-1. **Open in VSCode**
+### 2. Reference Usage
+```bash
+✅ Pin to specific versions: task-name.1.0.0.json
+✅ Use local refs for same-domain components
+✅ Test reference resolution regularly
+❌ Don't use latest or floating versions
+❌ Don't create circular dependencies
+```
+
+### 3. Domain Boundaries
+```bash
+✅ Keep domains focused and cohesive
+✅ Minimize cross-domain dependencies
+✅ Use events/messages for loose coupling
+❌ Don't create tightly coupled domains
+❌ Don't share database schemas directly
+```
+
+## 🚀 Development Workflow
+
+1. **Create Domain Project**
    ```bash
-   cd my-project
-   code .
-   ```
-
-2. **Install Dependencies**
-   ```bash
+   amorphie create identity-service
+   # or amp create identity-service
+   cd identity-service
    npm install
    ```
 
-3. **Start Development**
-   - Use `Ctrl/Cmd + Shift + P` → "Tasks: Run Task" for development tasks
-   - Create components using code snippets
-   - Validate your work with built-in tools
+2. **Develop Components**
+   ```bash
+   # Edit domain components in your-domain/ folder
+   # Use $ref for cross-domain references
+   ```
 
-4. **Follow Best Practices**
-   - Read the generated `.cursorrules` for domain guidelines
-   - Use semantic versioning for all components
-   - Validate components regularly during development
+3. **Validate & Test**
+   ```bash
+   amorphie validate --resolve-refs
+   # or amp validate --resolve-refs
+   amorphie visualize-boundaries -f json
+   # or amp visualize-boundaries -f json
+   ```
 
-## 🛠️ Development
+4. **Prepare for Publishing**
+   ```bash
+   # For cross-domain reference
+   amorphie build --type reference
+   # or amp build --type reference
+   amorphie publish --dry-run --type reference
+   
+   # For engine deployment
+   amorphie build --type runtime
+   # or amp build --type runtime
+   amorphie publish --dry-run --type runtime
+   ```
 
-To contribute to this CLI tool:
+5. **Publish to NPM**
+   ```bash
+   # Reference package for other domains
+   amorphie publish --type reference
+   
+   # Runtime package for deployment
+   amorphie publish --type runtime
+   ```
+
+## 🎯 Use Cases
+
+### Enterprise Domain Architecture
+- **Identity Domain**: User management, authentication
+- **Billing Domain**: Invoicing, payments, subscriptions  
+- **Onboarding Domain**: User registration, KYC processes
+- **Core Domain**: Shared utilities, common tasks
+
+### Component Reuse Scenarios
+- ✅ Billing domain installs `@amorphie/identity-reference` for user validation
+- ✅ Onboarding domain uses `@amorphie/core-reference` for cache invalidation
+- ✅ All domains use `@amorphie/core-reference` for audit logging tasks
+- ✅ Notification domain publishes `@amorphie/notifications-reference` for messaging
+
+### Package Distribution Strategy
+- **Reference Packages** (`-reference` suffix): For cross-domain dependencies
+- **Runtime Packages** (`-runtime` suffix): For engine deployment via CI/CD
+
+## 🛠️ Contributing
 
 ```bash
-git clone <repository>
-cd amorphie-cli
+git clone https://github.com/amorphie/cli
+cd cli
 npm install
-npm link  # Makes create-amorphie-app available globally
+npm link  # Makes amorphie available globally
 
 # Test the CLI
-create-amorphie-app test-project
+amorphie create test-domain
 ```
 
-## 📚 Learn More
+## 📚 Resources
 
-- [Amorphie Documentation](https://docs.amorphie.com)
+- [JSON Schema Validation](https://json-schema.org/)
 
 ## 📄 License
 
-MIT License - see LICENSE file for details.
+MIT License
 
 ---
 
-**Created with ❤️ by the Amorphie Team** 
+**🚀 Built for modern domain-driven architecture with ❤️ by the Amorphie Team** 
