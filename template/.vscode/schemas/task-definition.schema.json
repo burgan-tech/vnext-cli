@@ -390,8 +390,7 @@
                                 "properties": {
                                     "url": {
                                         "type": "string",
-                                        "description": "HTTP URL",
-                                        "format": "uri"
+                                        "description": "HTTP URL"
                                     },
                                     "method": {
                                         "type": "string",

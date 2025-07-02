@@ -110,15 +110,15 @@ async function testRefResolver() {
       "domain": "test",
       "tasks": [
         {
-          "$ref": "Tasks/task-example.1.0.0.json"
+          "ref": "Tasks/task-example.1.0.0.json"
         },
         {
-          "$ref": "@amorphie/domain-core/Tasks/task-audit.1.0.0.json"
+          "ref": "@amorphie/domain-core/Tasks/task-audit.1.0.0.json"
         }
       ],
       "nested": {
         "workflow": {
-          "$ref": "Workflows/example-flow.1.0.0.json"
+          "ref": "Workflows/example-flow.1.0.0.json"
         }
       }
     };
@@ -316,6 +316,136 @@ async function testRefResolver() {
       });
     }
 
+    // Test 16: ref validation for extension (raw payload)
+    console.log(chalk.yellow('\n📋 Test 16: Extension Schema Validation (Raw Payload)'));
+    
+    const extensionRawPayload = {
+      "key": "test-extension",
+      "version": "1.0.0",
+      "domain": "core",
+      "flow": "sys-extensions",
+      "flowVersion": "1.0.0",
+      "tags": ["test"],
+      "attributes": {
+        "type": 1,
+        "scope": 1,
+        "task": {
+          "order": 1,
+          "task": {
+            "key": "test-task",
+            "domain": "core",
+            "flow": "sys-tasks",
+            "version": "1.0.0"
+          },
+          "mapping": {
+            "location": "./src/TestMapping.csx",
+            "code": ""
+          }
+        }
+      }
+    };
+    
+    try {
+      await resolver.validateComponentSchema(extensionRawPayload, 'Extensions/test-extension.1.0.0.json');
+      console.log('  ✅ Extension raw payload validation passed');
+    } catch (error) {
+      console.log('  ⚠️  Extension raw payload validation error:', error.message);
+    }
+
+    // Test 17: ref validation for extension (ref payload)
+    console.log(chalk.yellow('\n📋 Test 17: Extension Schema Validation (ref Payload)'));
+    
+    const extensionRefPayload = {
+      "key": "test-extension-ref",
+      "version": "1.0.0",
+      "domain": "core",
+      "flow": "sys-extensions",
+      "flowVersion": "1.0.0",
+      "tags": ["test"],
+      "attributes": {
+        "type": 1,
+        "scope": 1,
+        "task": {
+          "order": 1,
+          "task": {
+            "ref": "Tasks/test-task.1.0.0.json"
+          },
+          "mapping": {
+            "location": "./src/TestMapping.csx",
+            "code": ""
+          }
+        }
+      }
+    };
+    
+    try {
+      await resolver.validateComponentSchema(extensionRefPayload, 'Extensions/test-extension-ref.1.0.0.json');
+      console.log('  ✅ Extension ref payload validation passed');
+    } catch (error) {
+      console.log('  ⚠️  Extension ref payload validation error:', error.message);
+    }
+
+    // Test 18: Function ref validation (raw payload)
+    console.log(chalk.yellow('\n📋 Test 18: Function Schema Validation (Raw Payload)'));
+    
+    const functionRawPayload = {
+      "key": "test-function",
+      "version": "1.0.0",
+      "domain": "core",
+      "flow": "sys-functions",
+      "flowVersion": "1.0.0",
+      "tags": ["test"],
+      "attributes": {
+        "scope": 1,
+        "task": {
+          "key": "test-task",
+          "domain": "core",
+          "flow": "sys-tasks",
+          "version": "1.0.0"
+        },
+        "mapping": {
+          "location": "./src/TestMapping.csx",
+          "code": ""
+        }
+      }
+    };
+    
+    try {
+      await resolver.validateComponentSchema(functionRawPayload, 'Functions/test-function.1.0.0.json');
+      console.log('  ✅ Function raw payload validation passed');
+    } catch (error) {
+      console.log('  ⚠️  Function raw payload validation error:', error.message);
+    }
+
+    // Test 19: Function ref validation (ref payload)
+    console.log(chalk.yellow('\n📋 Test 19: Function Schema Validation (ref Payload)'));
+    
+    const functionRefPayload = {
+      "key": "test-function-ref",
+      "version": "1.0.0",
+      "domain": "core",
+      "flow": "sys-functions",
+      "flowVersion": "1.0.0",
+      "tags": ["test"],
+      "attributes": {
+        "scope": 1,
+        "task": {
+          "ref": "Tasks/test-task.1.0.0.json"
+        },
+        "mapping": {
+          "location": "./src/TestMapping.csx",
+          "code": ""
+        }
+      }
+    };
+    
+    try {
+      await resolver.validateComponentSchema(functionRefPayload, 'Functions/test-function-ref.1.0.0.json');
+      console.log('  ✅ Function ref payload validation passed');
+    } catch (error) {
+      console.log('  ⚠️  Function ref payload validation error:', error.message);
+    }
+
     console.log(chalk.green('\n🎉 Enhanced Reference Resolver tests completed!'));
     console.log(chalk.blue('✨ New features tested:'));
     console.log('  • Reference consistency validation (filename vs content)');
@@ -329,6 +459,7 @@ async function testRefResolver() {
     console.log('  • Enhanced error reporting with detailed paths');
     console.log('  • Metadata cleanup (fixes additionalProperties: false schema errors)');
     console.log('  • Component type detection fix (paths with/without leading slash)');
+    console.log('  • ref support validation for all reference types');
     console.log(chalk.gray('ℹ️  Note: Some tests failed because referenced files don\'t exist - this is expected.'));
 
   } catch (error) {

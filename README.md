@@ -36,9 +36,9 @@ The Amorphie CLI implements a **modular, schema-based, configuration-controlled 
    - **Reference Package**: `@amorphie/domain-identity-reference` (for cross-domain usage)
    - **Runtime Package**: `@amorphie/domain-identity-runtime` (for engine deployment)
 ✅ **Export control** through `amorphie.config.json` - domains expose only what they want to share  
-✅ **Reference resolution** using `$ref` patterns for cross-domain component usage  
+✅ **Reference resolution** using `ref` patterns for cross-domain component usage  
 ✅ **Schema validation** ensures interface compatibility between domains  
-✅ **Build-time reference replacement** - converts `$ref` to deployment-ready payloads  
+✅ **Build-time reference replacement** - converts `ref` to deployment-ready payloads  
 ✅ **NPM-based distribution** with semantic versioning and caching  
 
 ## 📋 Project Structure
@@ -49,7 +49,7 @@ After running `amorphie create`, you'll get:
 my-domain-project/
 ├── your-domain/                    # Domain components directory
 │   ├── Workflows/                  # Business process workflows  
-│   │   └── sys-flows.1.0.0.json   # Example with $ref usage
+│   │   └── sys-flows.1.0.0.json   # Example with ref usage
 │   ├── Functions/                  # Serverless functions
 │   ├── Views/                      # UI components and views
 │   ├── Extensions/                 # Custom framework extensions
@@ -97,7 +97,7 @@ Control what your domain exposes through `amorphie.config.json`:
 
 ### 🔗 Reference Resolution System
 
-Use `$ref` to reference components across domains:
+Use `ref` to reference components across domains:
 
 ```json
 {
@@ -105,10 +105,10 @@ Use `$ref` to reference components across domains:
   "domain": "onboarding", 
   "tasks": [
     {
-      "$ref": "@amorphie/domain-core-reference/Tasks/task-invalidate-cache.1.0.0.json"
+      "ref": "@amorphie/domain-core-reference/Tasks/task-invalidate-cache.1.0.0.json"
     },
     {
-      "$ref": "Tasks/local-task.1.0.0.json"
+      "ref": "Tasks/local-task.1.0.0.json"
     }
   ]
 }
@@ -169,7 +169,7 @@ amorphie visualize-boundaries -f json -o dependencies.json
 ### Validate with Reference Resolution
 
 ```bash
-# Validate all JSON files and resolve $ref references
+# Validate all JSON files and resolve ref references
 amorphie validate --resolve-refs
 amp validate --resolve-refs              # Short form
 
@@ -180,7 +180,7 @@ amp validate --resolve-refs --strict     # Short form
 
 **What happens during validation:**
 1. ✅ Scans all JSON files in your domain
-2. ✅ Finds `$ref` properties pointing to external components  
+2. ✅ Finds `ref` properties pointing to external components  
 3. ✅ Downloads referenced NPM packages to `.amorphie-cache`
 4. ✅ Checks if referenced components are exported by target domain
 5. ✅ Validates schema compatibility between versions
@@ -224,16 +224,16 @@ amorphie build --skip-validation    # Skip validation (not recommended)
 
 **📦 Reference Build** (`--type reference`, default):
 - ✅ Only exported components (defined in `amorphie.config.json`)
-- ✅ Reference resolution: `$ref` → payload objects
+- ✅ Reference resolution: `ref` → payload objects
 - ✅ Minimal package for cross-domain usage
 - ✅ Package name: `{original-name}-reference`
 - ✅ Other domains can npm install and reference
 
-**🚀 Runtime Build** (`--type runtime`):
-- ✅ Complete domain structure (all files and folders)
-- ✅ No reference resolution (preserves original `$ref`)
-- ✅ Package name: `{original-name}-runtime`
-- ✅ Ready for CI/CD deployment to engine
+  **🚀 Runtime Build** (`--type runtime`):
+  - ✅ Complete domain structure (all files and folders)
+  - ✅ Reference resolution: `ref` → payload objects (same as reference build)
+  - ✅ Package name: `{original-name}-runtime`
+  - ✅ Ready for CI/CD deployment to engine
 - ✅ Includes internal components and supporting files
 
 #### Build Process
@@ -246,7 +246,7 @@ amorphie build --skip-validation    # Skip validation (not recommended)
 // Before build (development):
 {
   "task": {
-    "$ref": "Tasks/task-invalidate-cache.1.0.0.json"
+    "ref": "Tasks/task-invalidate-cache.1.0.0.json"
   }
 }
 
@@ -260,8 +260,8 @@ amorphie build --skip-validation    # Skip validation (not recommended)
   }
 }
 
-// Runtime build preserves original $ref for engine processing
-```
+  // Runtime build also converts ref to payload for consistency
+  ```
 
 ### Publish to NPM
 
@@ -413,7 +413,7 @@ graph TD
 2. **Develop Components**
    ```bash
    # Edit domain components in your-domain/ folder
-   # Use $ref for cross-domain references
+   # Use ref for cross-domain references
    ```
 
 3. **Validate & Test**

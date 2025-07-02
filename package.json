@@ -37,9 +37,12 @@
   "devDependencies": {
     "nodemon": "^2.0.20"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/amorphie/cli"
+    "url": "git+https://github.com/amorphie/Amorphie.Cli.git"
   },
   "engines": {
     "node": ">=14.0.0"

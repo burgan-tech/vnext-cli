@@ -356,149 +356,254 @@
       }
     },
     "functionReference": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Function key"
+      "description": "Function reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit function reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Function key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for functions",
+              "const": "sys-functions"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for functions",
-          "const": "sys-functions"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "Function reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to function file",
+              "pattern": "^Functions/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "extensionReference": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Extension key"
+      "description": "Extension reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit extension reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Extension key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for extensions",
+              "const": "sys-extensions"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for extensions",
-          "const": "sys-extensions"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "Extension reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to extension file",
+              "pattern": "^Extensions/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "taskReference": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Task key"
+      "description": "Task reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit task reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Task key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for tasks",
+              "const": "sys-tasks"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for tasks",
-          "const": "sys-tasks"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "Task reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to task file",
+              "pattern": "^Tasks/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "viewReference": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "View key"
+      "description": "View reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit view reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "View key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for views",
+              "const": "sys-views"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for views",
-          "const": "sys-views"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "View reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to view file",
+              "pattern": "^Views/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "schemaReference": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Schema key"
+      "description": "Schema reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit schema reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Schema key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for schemas",
+              "const": "sys-schemas"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for schemas",
-          "const": "sys-schemas"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "Schema reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to schema file",
+              "pattern": "^Schemas/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "mapping": {
       "type": "object",
@@ -537,33 +642,54 @@
       }
     },
     "task": {
-      "type": "object",
-      "required": [
-        "key",
-        "domain",
-        "flow",
-        "version"
-      ],
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Task key"
+      "description": "Task reference - can be either explicit reference or $ref",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Explicit task reference",
+          "required": [
+            "key",
+            "domain",
+            "flow",
+            "version"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Task key"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Domain name"
+            },
+            "flow": {
+              "type": "string",
+              "description": "Flow name for tasks",
+              "const": "sys-tasks"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version in Major.Minor.Patch format",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
         },
-        "domain": {
-          "type": "string",
-          "description": "Domain name"
-        },
-        "flow": {
-          "type": "string",
-          "description": "Flow name for tasks",
-          "const": "sys-tasks"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version in Major.Minor.Patch format",
-          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        {
+          "type": "object",
+          "description": "Task reference using ref",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to task file",
+              "pattern": "^Tasks/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      ]
     },
     "executionTask": {
       "type": "object",

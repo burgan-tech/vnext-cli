@@ -109,7 +109,7 @@ program
 program
   .command('validate')
   .description('Validate domain components and resolve references')
-  .option('--resolve-refs', 'Resolve and validate all $ref references')
+  .option('--resolve-refs', 'Resolve and validate all ref references')
   .option('--strict', 'Enable strict validation mode')
   .action(async (options) => {
     try {
@@ -353,22 +353,55 @@ program
         }
         
       } else if (options.type === 'runtime') {
-        console.log(chalk.blue('\n📁 Step 3: Copying complete domain structure for runtime...'));
+        console.log(chalk.blue('\n📁 Step 3: Processing complete domain structure with reference resolution...'));
+        
+        const resolver = new RefResolver({
+          schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+        });
+        await resolver.loadValidationConfig(configPath);
         
         const domainPath = path.join(process.cwd(), config.paths?.componentsRoot || config.domain);
         const targetDomainPath = path.join(outputDir, config.domain);
         
         if (await fs.pathExists(domainPath)) {
-          // Copy entire domain directory structure
-          await fs.copy(domainPath, targetDomainPath);
+          console.log(chalk.gray(`📁 Source domain path: ${domainPath}`));
+          console.log(chalk.gray(`📁 Target domain path: ${targetDomainPath}`));
           
-          // Count copied files
-          const allFiles = await getAllFiles(targetDomainPath);
-          copiedFiles = allFiles.filter(file => path.extname(file) === '.json').length;
+          // Get all files recursively
+          const allFiles = await getAllFiles(domainPath);
+          console.log(chalk.gray(`📄 Found ${allFiles.length} files to process`));
           
-          console.log(chalk.green(`  ✅ Copied complete domain structure`));
-          console.log(chalk.gray(`    - ${copiedFiles} JSON component files`));
-          console.log(chalk.gray(`    - All supporting files and folders`));
+          for (const filePath of allFiles) {
+            const targetPath = path.join(targetDomainPath, path.relative(domainPath, filePath));
+            await fs.ensureDir(path.dirname(targetPath));
+            
+            const relativePath = path.relative(domainPath, filePath);
+            
+            // Process JSON files with reference resolution
+            if (path.extname(filePath) === '.json') {
+              try {
+                console.log(chalk.gray(`🔄 Processing JSON: ${relativePath}`));
+                const originalContent = await fs.readJSON(filePath);
+                const processedContent = await resolveReferencesToPayload(originalContent, resolver, config.domain);
+                await fs.writeJSON(targetPath, processedContent, { spaces: 2 });
+                console.log(chalk.green(`✅ Processed: ${relativePath}`));
+                copiedFiles++;
+              } catch (error) {
+                console.log(chalk.yellow(`⚠️  JSON processing failed for ${relativePath}, copying as-is: ${error.message}`));
+                // If JSON processing fails, copy as-is
+                await fs.copy(filePath, targetPath);
+                if (path.extname(filePath) === '.json') copiedFiles++;
+              }
+            } else {
+              // Copy non-JSON files as-is
+              console.log(chalk.gray(`📄 Copying non-JSON: ${relativePath}`));
+              await fs.copy(filePath, targetPath);
+            }
+          }
+          
+          console.log(chalk.green(`  ✅ Processed complete domain structure with reference resolution`));
+          console.log(chalk.gray(`    - ${copiedFiles} JSON component files processed`));
+          console.log(chalk.gray(`    - All supporting files and folders copied`));
         } else {
           console.log(chalk.red(`  ❌ Domain directory not found: ${domainPath}`));
         }
@@ -781,7 +814,7 @@ function generateDotDiagram(boundaries) {
 }
 
 /**
- * Resolves all $ref references in a JSON object to their payload equivalents
+ * Resolves all ref references in a JSON object to their payload equivalents
  * @param {Object} obj - JSON object to process
  * @param {RefResolver} resolver - Reference resolver instance
  * @param {string} currentDomain - Current domain context
@@ -800,13 +833,13 @@ async function resolveReferencesToPayload(obj, resolver, currentDomain) {
     return resolvedArray;
   }
 
-  // Check if this object has a $ref property
-  if (obj.$ref && typeof obj.$ref === 'string') {
+  // Check if this object has a ref property
+  if (obj.ref && typeof obj.ref === 'string') {
     try {
-      console.log(chalk.gray(`    🔗 Resolving $ref: ${obj.$ref}`));
+      console.log(chalk.gray(`    🔗 Resolving ref: ${obj.ref}`));
       
       // Resolve the reference to get the full component
-      const resolvedComponent = await resolver.resolveRef(obj.$ref, currentDomain);
+      const resolvedComponent = await resolver.resolveRef(obj.ref, currentDomain);
       
       // Extract the payload (key, version, domain, flow)
       const payload = {
@@ -821,8 +854,8 @@ async function resolveReferencesToPayload(obj, resolver, currentDomain) {
       return payload;
       
     } catch (error) {
-      console.log(chalk.red(`    ❌ Failed to resolve $ref: ${obj.$ref} - ${error.message}`));
-      // Return original $ref if resolution fails
+      console.log(chalk.red(`    ❌ Failed to resolve ref: ${obj.ref} - ${error.message}`));
+      // Return original ref if resolution fails
       return obj;
     }
   }
@@ -933,11 +966,45 @@ async function buildPackage(outputDir, type = 'reference') {
       }
     }
   } else if (type === 'runtime') {
-    // Runtime build: complete domain structure, no reference resolution
+    // Runtime build: complete domain structure with reference resolution
+    console.log(chalk.blue(`🔧 Processing runtime build for domain: ${config.domain}`));
     const targetDomainPath = path.join(fullOutputDir, config.domain);
     
     if (await fs.pathExists(domainPath)) {
-      await fs.copy(domainPath, targetDomainPath);
+      console.log(chalk.gray(`📁 Source domain path: ${domainPath}`));
+      console.log(chalk.gray(`📁 Target domain path: ${targetDomainPath}`));
+      
+      // Get all files recursively
+      const allFiles = await getAllFiles(domainPath);
+      console.log(chalk.gray(`📄 Found ${allFiles.length} files to process`));
+      
+      for (const filePath of allFiles) {
+        const targetPath = path.join(targetDomainPath, path.relative(domainPath, filePath));
+        await fs.ensureDir(path.dirname(targetPath));
+        
+        const relativePath = path.relative(domainPath, filePath);
+        
+        // Process JSON files with reference resolution
+        if (path.extname(filePath) === '.json') {
+          try {
+            console.log(chalk.gray(`🔄 Processing JSON: ${relativePath}`));
+            const originalContent = await fs.readJSON(filePath);
+            const processedContent = await resolveReferencesToPayload(originalContent, resolver, config.domain);
+            await fs.writeJSON(targetPath, processedContent, { spaces: 2 });
+            console.log(chalk.green(`✅ Processed: ${relativePath}`));
+          } catch (error) {
+            console.log(chalk.yellow(`⚠️  JSON processing failed for ${relativePath}, copying as-is: ${error.message}`));
+            // If JSON processing fails, copy as-is
+            await fs.copy(filePath, targetPath);
+          }
+        } else {
+          // Copy non-JSON files as-is
+          console.log(chalk.gray(`📄 Copying non-JSON: ${relativePath}`));
+          await fs.copy(filePath, targetPath);
+        }
+      }
+    } else {
+      console.log(chalk.red(`❌ Domain path not found: ${domainPath}`));
     }
   }
 }
