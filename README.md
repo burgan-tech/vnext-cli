@@ -7,7 +7,7 @@ Modern CLI tool for creating and managing modular, domain-driven Amorphie projec
 ### Installation
 
 ```bash
-npm install -g amorphie-cli
+npm install -g @amorphie/cli
 ```
 
 ### Create a New Domain Project
@@ -23,7 +23,7 @@ amorphie create my-domain-project
 amp create my-domain-project
 
 # Using npx (no global installation needed)
-npx amorphie-cli create my-domain-project
+npx @amorphie/cli create my-domain-project
 ```
 
 > 💡 **Tip:** You can use `amp` as a shorthand for `amorphie` in all commands for faster development.
