@@ -73,5 +73,49 @@
           "createSample": false,
           "domain": "{domainName}"
       }
+  },
+  "exports": {
+    "functions": [
+      "calculate-risk-score.1.0.0.json",
+      "validate-user-data.1.1.0.json"
+    ],
+    "workflows": [
+      "sys-flows.1.0.0.json"
+    ],
+    "tasks": [
+      "task-invalidate-cache.1.0.0.json"
+    ],
+    "views": [],
+    "schemas": [],
+    "extensions": [],
+    "visibility": "public",
+    "metadata": {
+      "description": "Exported components for {domainName} domain",
+      "maintainer": "Amorphie Team",
+      "license": "MIT",
+      "keywords": ["{domainName}", "amorphie", "workflow", "domain"]
+    }
+  },
+  "dependencies": {
+    "domains": [],
+    "npm": []
+  },
+  "referenceResolution": {
+    "enabled": true,
+    "validateOnBuild": true,
+    "strictMode": true,
+    "validateReferenceConsistency": true,
+    "validateSchemas": true,
+    "allowedHosts": [
+      "registry.npmjs.org",
+      "npm.amorphie.com",
+      "npm.pkg.github.com"
+    ],
+    "schemaValidationRules": {
+      "enforceKeyFormat": true,
+      "enforceVersionFormat": true,
+      "enforceFilenameConsistency": true,
+      "allowUnknownProperties": false
+    }
   }
 }

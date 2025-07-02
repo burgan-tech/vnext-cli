@@ -1,37 +1,41 @@
 {
-  "name": "@amorphie/cli",
-  "version": "1.0.0-beta.5",
-  "description": "CLI tool for creating Amorphie template projects",
+  "name": "amorphie-cli",
+  "version": "1.0.0",
+  "description": "CLI for creating and managing Amorphie domain projects with modular component sharing",
   "main": "create.js",
   "bin": {
-    "create-amorphie-app": "./create.js",
     "amorphie": "./create.js",
     "amp": "./create.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node create.js",
+    "dev": "node create.js",
+    "publish-test": "npm version patch && npm publish"
   },
   "keywords": [
     "amorphie",
-    "vnext",
     "cli",
     "template",
-    "generator"
+    "domain",
+    "workflow",
+    "microservices",
+    "modular",
+    "npm-packages"
   ],
   "author": "Amorphie Team",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
     "chalk": "^4.1.2",
-    "commander": "^11.0.0",
-    "fs-extra": "^11.1.1",
-    "inquirer": "^8.2.6"
+    "commander": "^9.4.1",
+    "fs-extra": "^10.1.0",
+    "inquirer": "^8.2.5",
+    "semver": "^7.5.4"
   },
-  "files": [
-    "create.js",
-    "template/"
-  ],
-  "engines": {
-    "node": ">=14.0.0"
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
@@ -39,5 +43,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/amorphie/Amorphie.Cli.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

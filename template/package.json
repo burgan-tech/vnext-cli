@@ -27,7 +27,7 @@
   "author": "{domainName} Team",
   "license": "MIT",
   "dependencies": {
-    "@amorphie/definition-core": "^1.0.0"
+    "@amorphie/core-reference": "^1.0.0"
   },
   "devDependencies": {
     "ajv": "^8.12.0",

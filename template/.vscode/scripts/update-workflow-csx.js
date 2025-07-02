@@ -208,6 +208,14 @@ function processWorkflowDirectory(dirPath, specificFile = null) {
     if (workflowData.attributes && workflowData.attributes.states) {
         updateRulesInStates(workflowData.attributes.states);
     }
+
+    // Extension and Functions task
+    if (workflowData.attributes && workflowData.attributes.task) {
+        const taskItem = workflowData.attributes.task;
+        if (taskItem) {
+            updateTasksInCollection([taskItem], 'task');
+        }
+    }
     
     // Write updated JSON
     try {

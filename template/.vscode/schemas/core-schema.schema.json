@@ -177,7 +177,7 @@
                     ],
                     "description": "Transition type"
                 },
-                "onExecute": {
+                "onExecutionTasks": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/taskReference"
@@ -222,40 +222,63 @@
             "description": "Version strategy for updates"
         },
         "reference": {
-            "type": "object",
-            "required": [
-                "domain",
-                "workflow"
-            ],
-            "properties": {
-                "key": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string",
-                    "format": "uuid"
-                },
-                "domain": {
-                    "type": "string"
-                },
-                "workflow": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string",
-                    "pattern": "^\\d+\\.\\d+\\.\\d+$"
-                }
-            },
-            "anyOf": [
+            "description": "Generic reference - can be either explicit reference or ref",
+            "oneOf": [
                 {
+                    "type": "object",
+                    "description": "Explicit reference",
                     "required": [
-                        "key"
+                        "key",
+                        "domain",
+                        "flow",
+                        "version"
+                    ],
+                    "properties": {
+                        "key": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "domain": {
+                            "type": "string"
+                        },
+                        "flow": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string",
+                            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": [
+                                "key"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        }
                     ]
                 },
                 {
+                    "type": "object",
+                    "description": "Reference using ref",
                     "required": [
-                        "id"
-                    ]
+                        "ref"
+                    ],
+                    "properties": {
+                        "ref": {
+                            "type": "string",
+                            "description": "Reference to component file",
+                            "pattern": "^[A-Za-z]+/[a-z0-9-]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.json$"
+                        }
+                    },
+                    "additionalProperties": false
                 }
             ]
         },
