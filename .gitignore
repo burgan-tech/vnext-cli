@@ -50,7 +50,7 @@ coverage/
 # Build output
 dist/
 build/
-lib/
+#lib/
 
 # IDE files
 #.vscode/
