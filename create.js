@@ -6,11 +6,12 @@ const { program } = require('commander');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const RefResolver = require('./lib/ref-resolver');
+const packageJson = require('./package.json');
 
 program
   .name('amorphie')
-  .description('CLI for creating and managing Amorphie domain projects')
-  .version('1.0.0');
+  .description(packageJson.description)
+  .version(packageJson.version);
 
 // Create command (existing functionality)
 program
@@ -107,11 +108,11 @@ program
 
 // Validate command with reference resolution
 program
-  .command('validate')
-  .description('Validate domain components and resolve references')
+  .command('validate [file]')
+  .description('Validate domain components and resolve references (optionally specify a single file)')
   .option('--resolve-refs', 'Resolve and validate all ref references')
   .option('--strict', 'Enable strict validation mode')
-  .action(async (options) => {
+  .action(async (file, options) => {
     try {
       console.log(chalk.blue('🔍 Validating domain components...'));
       
@@ -140,9 +141,29 @@ program
       let totalRefs = 0;
       let validRefs = 0;
 
-      // Scan all JSON files
-      const scanPath = path.join(process.cwd(), config.paths?.componentsRoot || config.domain);
-      const jsonFiles = await findJsonFiles(scanPath);
+      let jsonFiles = [];
+      
+      if (file) {
+        // Single file validation
+        const filePath = path.resolve(process.cwd(), file);
+        if (!(await fs.pathExists(filePath))) {
+          console.log(chalk.red(`❌ File not found: ${file}`));
+          process.exit(1);
+        }
+        
+        if (path.extname(filePath) !== '.json') {
+          console.log(chalk.red(`❌ Only JSON files are supported for validation`));
+          process.exit(1);
+        }
+        
+        jsonFiles = [filePath];
+        console.log(chalk.blue(`🔍 Validating single file: ${file}`));
+      } else {
+        // Scan all JSON files
+        const scanPath = path.join(process.cwd(), config.paths?.componentsRoot || config.domain);
+        jsonFiles = await findJsonFiles(scanPath);
+        console.log(chalk.blue(`🔍 Validating all components in ${config.domain}...`));
+      }
 
       for (const filePath of jsonFiles) {
         totalFiles++;
@@ -555,11 +576,11 @@ program
 
 // Visualize boundaries command
 program
-  .command('visualize-boundaries')
-  .description('Generate domain boundary visualization')
+  .command('visualize-boundaries [file]')
+  .description('Generate domain boundary visualization (optionally specify a single file)')
   .option('-f, --format <format>', 'Output format (json, mermaid, dot)', 'json')
   .option('-o, --output <file>', 'Output file path')
-  .action(async (options) => {
+  .action(async (file, options) => {
     try {
       console.log(chalk.blue('🗺️  Generating domain boundary visualization...'));
       
@@ -572,9 +593,30 @@ program
       const config = await fs.readJSON(configPath);
       const resolver = new RefResolver();
       
-      // Scan all JSON files for references
-      const scanPath = path.join(process.cwd(), config.paths?.componentsRoot || config.domain);
-      const jsonFiles = await findJsonFiles(scanPath);
+      let jsonFiles = [];
+      let isGlobal = !file;
+      
+      if (file) {
+        // Single file visualization
+        const filePath = path.resolve(process.cwd(), file);
+        if (!(await fs.pathExists(filePath))) {
+          console.log(chalk.red(`❌ File not found: ${file}`));
+          process.exit(1);
+        }
+        
+        if (path.extname(filePath) !== '.json') {
+          console.log(chalk.red(`❌ Only JSON files are supported for visualization`));
+          process.exit(1);
+        }
+        
+        jsonFiles = [filePath];
+        console.log(chalk.blue(`🗺️  Visualizing boundaries for single file: ${file}`));
+      } else {
+        // Scan all JSON files for references
+        const scanPath = path.join(process.cwd(), config.paths?.componentsRoot || config.domain);
+        jsonFiles = await findJsonFiles(scanPath);
+        console.log(chalk.blue(`🗺️  Visualizing boundaries for all components in ${config.domain}...`));
+      }
       
       const boundaries = {
         domain: config.domain,
@@ -587,6 +629,9 @@ program
       for (const filePath of jsonFiles) {
         try {
           const content = await fs.readJSON(filePath);
+          const scanPath = isGlobal ? 
+            path.join(process.cwd(), config.paths?.componentsRoot || config.domain) :
+            path.dirname(filePath);
           const relativePath = path.relative(scanPath, filePath);
           
           boundaries.components.push({
@@ -644,13 +689,35 @@ program
         await fs.writeFile(options.output, output);
         console.log(chalk.green(`✅ Visualization saved to ${options.output}`));
       } else {
-        console.log('\n' + output);
+        // Auto-generate output file name and path
+        let outputFile = '';
+        
+        if (isGlobal) {
+          // Global mode: use domain name
+          outputFile = `${config.domain}.${options.format}`;
+        } else {
+          // Single file mode: use file name + "-visualize" suffix
+          const inputFile = path.resolve(process.cwd(), file);
+          const inputDir = path.dirname(inputFile);
+          const inputName = path.basename(inputFile, '.json');
+          outputFile = path.join(inputDir, `${inputName}-visualize.${options.format}`);
+        }
+        
+        await fs.writeFile(outputFile, output);
+        console.log(chalk.green(`✅ Visualization saved to ${outputFile}`));
       }
 
       console.log(chalk.blue(`\n📊 Boundary Analysis:`));
-      console.log(`Components: ${boundaries.components.length}`);
-      console.log(`References: ${boundaries.references.length}`);
-      console.log(`External Dependencies: ${boundaries.dependencies.length}`);
+      if (isGlobal) {
+        console.log(`Components: ${boundaries.components.length}`);
+        console.log(`References: ${boundaries.references.length}`);
+        console.log(`External Dependencies: ${boundaries.dependencies.length}`);
+      } else {
+        console.log(`Component: ${boundaries.components[0]?.key || 'Unknown'}`);
+        console.log(`Type: ${boundaries.components[0]?.type || 'Unknown'}`);
+        console.log(`References: ${boundaries.references.length}`);
+        console.log(`External Dependencies: ${boundaries.dependencies.length}`);
+      }
 
     } catch (error) {
       console.error(chalk.red('Visualization error:'), error.message);
