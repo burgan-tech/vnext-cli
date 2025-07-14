@@ -132,6 +132,10 @@ amp create [project-name]                # Short form
 amorphie validate --resolve-refs --strict
 amp validate --resolve-refs --strict     # Short form
 
+# Validate single file
+amorphie validate path/to/component.json --resolve-refs
+amp validate path/to/component.json --resolve-refs     # Short form
+
 # Build packages for different purposes
 amorphie build                           # Default: reference build
 amorphie build --type reference          # For cross-domain usage
@@ -162,6 +166,10 @@ amp list-exports @amorphie/domain-core-reference   # Short form
 amorphie visualize-boundaries -f mermaid -o boundaries.md
 amp visualize-boundaries -f mermaid -o boundaries.md    # Short form
 amorphie visualize-boundaries -f json -o dependencies.json
+
+# Single file boundary visualization
+amorphie visualize-boundaries path/to/component.json -f json
+amp visualize-boundaries path/to/component.json -f json  # Short form
 ```
 
 ## 🔍 Reference Resolution & Validation
@@ -176,6 +184,14 @@ amp validate --resolve-refs              # Short form
 # Enable strict mode validation
 amorphie validate --resolve-refs --strict
 amp validate --resolve-refs --strict     # Short form
+
+# Validate single file
+amorphie validate identity/Workflows/login.json --resolve-refs
+amp validate identity/Workflows/login.json --resolve-refs     # Short form
+
+# Single file with strict validation
+amorphie validate identity/Functions/auth.json --resolve-refs --strict
+amp validate identity/Functions/auth.json --resolve-refs --strict     # Short form
 ```
 
 **What happens during validation:**
@@ -200,6 +216,40 @@ Files: 2/2 valid
 References: 3/3 resolved
 🎉 All validations passed!
 ```
+
+### Single File Operations
+
+Both `validate` and `visualize-boundaries` commands support single file operations for focused development:
+
+#### Single File Validation
+```bash
+# Validate specific component
+amorphie validate identity/Workflows/user-registration.json --resolve-refs
+amp validate identity/Functions/calculate-score.json --resolve-refs
+
+# With strict mode
+amorphie validate identity/Tasks/cleanup.json --resolve-refs --strict
+```
+
+#### Single File Visualization
+```bash
+# Analyze single component dependencies
+amorphie visualize-boundaries identity/Workflows/login.json -f json
+# Creates: identity/Workflows/login-visualize.json
+
+amorphie visualize-boundaries identity/Functions/auth.json -f mermaid
+# Creates: identity/Functions/auth-visualize.mermaid
+```
+
+**Smart Output Naming:**
+- **Global mode**: `{domain}.{format}` (e.g., `identity.json`)
+- **Single file mode**: `{filename}-visualize.{format}` (e.g., `login-visualize.json`)
+
+**Benefits:**
+- ✅ Faster development cycle - validate/analyze individual components
+- ✅ Focused debugging - isolate issues to specific files
+- ✅ Component-level dependency analysis
+- ✅ Automatic file naming prevents conflicts
 
 ## 📦 Building & Distribution 
 
@@ -296,17 +346,30 @@ amp publish --registry https://npm.amorphie.com    # Short form
 Generate visual representations of your domain dependencies:
 
 ```bash
-# JSON format (default)
+# JSON format (default) - auto-generates: {domain}.json
 amorphie visualize-boundaries
 amp visualize-boundaries                 # Short form
 
-# Mermaid diagram
-amorphie visualize-boundaries -f mermaid -o boundaries.md
-amp visualize-boundaries -f mermaid -o boundaries.md    # Short form
+# Mermaid diagram - auto-generates: {domain}.mermaid
+amorphie visualize-boundaries -f mermaid
+amp visualize-boundaries -f mermaid     # Short form
 
-# DOT format for Graphviz
-amorphie visualize-boundaries -f dot -o graph.dot
-amp visualize-boundaries -f dot -o graph.dot           # Short form
+# DOT format for Graphviz - auto-generates: {domain}.dot
+amorphie visualize-boundaries -f dot
+amp visualize-boundaries -f dot         # Short form
+
+# Manual output file
+amorphie visualize-boundaries -f mermaid -o boundaries.md
+amp visualize-boundaries -f json -o dependencies.json
+
+# Single file boundary visualization
+amorphie visualize-boundaries identity/Workflows/login.json -f json
+# Creates: identity/Workflows/login-visualize.json
+amp visualize-boundaries identity/Functions/auth.json -f mermaid  
+# Creates: identity/Functions/auth-visualize.mermaid
+
+# Single file with manual output
+amorphie visualize-boundaries identity/Workflows/login.json -f json -o my-analysis.json
 ```
 
 ### Example Mermaid Output
@@ -418,10 +481,21 @@ graph TD
 
 3. **Validate & Test**
    ```bash
+   # Validate all components
    amorphie validate --resolve-refs
    # or amp validate --resolve-refs
+   
+   # Validate single file during development
+   amorphie validate identity/Workflows/login.json --resolve-refs
+   # or amp validate identity/Workflows/login.json --resolve-refs
+   
+   # Visualize all domain boundaries
    amorphie visualize-boundaries -f json
    # or amp visualize-boundaries -f json
+   
+   # Visualize single component dependencies
+   amorphie visualize-boundaries identity/Workflows/login.json -f json
+   # or amp visualize-boundaries identity/Workflows/login.json -f json
    ```
 
 4. **Prepare for Publishing**
