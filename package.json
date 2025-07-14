@@ -1,6 +1,6 @@
 {
   "name": "@amorphie/cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for creating and managing Amorphie domain projects with modular component sharing",
   "main": "create.js",
   "bin": {
