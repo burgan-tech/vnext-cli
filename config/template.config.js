@@ -15,10 +15,6 @@ module.exports = {
     schemaPackageName: '@amorphie/schema-definitions'
   },
   
-
-  // Git Access Token (Private repository için)
-  // Environment variable: AMORPHIE_TEMPLATE_TOKEN
-  // GitHub Personal Access Token with 'repo' permission
   gitToken: '',
   
   // Default Template Version
