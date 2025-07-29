@@ -2,8 +2,6 @@ name: Publish Amorphie CLI Package
 
 on:
   push:
-    branches:
-      - master  # Your main branch is master based on git status
     tags:
       - 'v*'  # Version tag'lerde de çalışır
   release:

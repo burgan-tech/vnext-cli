@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 npm-debug.log*
+
+# Template cache
+.amorphie-template-cache/
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
