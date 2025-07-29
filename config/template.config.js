@@ -19,7 +19,7 @@ module.exports = {
   // Git Access Token (Private repository için)
   // Environment variable: AMORPHIE_TEMPLATE_TOKEN
   // GitHub Personal Access Token with 'repo' permission
-  gitToken: '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',
+  gitToken: '',
   
   // Default Template Version
   defaultVersion: 'latest',
