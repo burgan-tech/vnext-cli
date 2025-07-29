@@ -1,563 +1,559 @@
 # Amorphie CLI
 
-Modern CLI tool for creating and managing modular, domain-driven Amorphie projects with NPM-based component sharing and reference resolution.
+CLI for creating and managing Amorphie domain projects with modular component sharing and Git-based template management.
 
-## 🚀 Quick Start
+## 🚀 Features
 
-### Installation
+- **Git-based Template Management**: Templates hosted in separate Git repository
+- **NPM-based Schema Management**: Schema definitions from NPM packages with runtime versioning
+- **Version Control**: Semantic versioning support with automatic latest version detection
+- **Built-in Credentials**: No need to provide Git tokens manually
+- **Domain Project Creation**: Create new Amorphie domain projects with standardized structure
+- **Advanced Component Validation**: Always-on schema validation + optional reference resolution
+- **Runtime Version Support**: Schema validation tied to specific runtime versions
+- **Build & Publish**: Build and publish domain packages for cross-domain usage
+- **Reference Resolution**: Resolve cross-domain component references
+- **Template & Schema Cache Management**: Efficient caching system for template and schema versions
+- **GitHub Package Registry Support**: Authentication and private package support
+
+## 📦 Installation
 
 ```bash
 npm install -g @amorphie/cli
 ```
 
-### Create a New Domain Project
+## 🔧 Quick Start
+
+### Create New Project
 
 ```bash
-# Interactive mode - prompts for project and domain names
-amorphie create
-# or use the short form
-amp create
+# Create with latest template version
+amorphie create my-project
 
-# With project name - will prompt for domain name  
-amorphie create my-domain-project
-amp create my-domain-project
+# Create with specific template version
+amorphie create my-project --version v2.1.0
 
-# Using npx (no global installation needed)
-npx @amorphie/cli create my-domain-project
+# List available versions first
+amorphie create my-project --list-versions
 ```
 
-> 💡 **Tip:** You can use `amp` as a shorthand for `amorphie` in all commands for faster development.
-
-## 🏗️ Modular Domain Architecture
-
-The Amorphie CLI implements a **modular, schema-based, configuration-controlled domain sharing** system where:
-
-✅ **Dual Package Strategy**: Each domain publishes two NPM packages:
-   - **Reference Package**: `@amorphie/domain-identity-reference` (for cross-domain usage)
-   - **Runtime Package**: `@amorphie/domain-identity-runtime` (for engine deployment)
-✅ **Export control** through `amorphie.config.json` - domains expose only what they want to share  
-✅ **Reference resolution** using `ref` patterns for cross-domain component usage  
-✅ **Schema validation** ensures interface compatibility between domains  
-✅ **Build-time reference replacement** - converts `ref` to deployment-ready payloads  
-✅ **NPM-based distribution** with semantic versioning and caching  
-
-## 📋 Project Structure
-
-After running `amorphie create`, you'll get:
-
-```
-my-domain-project/
-├── your-domain/                    # Domain components directory
-│   ├── Workflows/                  # Business process workflows  
-│   │   └── sys-flows.1.0.0.json   # Example with ref usage
-│   ├── Functions/                  # Serverless functions
-│   ├── Views/                      # UI components and views
-│   ├── Extensions/                 # Custom framework extensions
-│   ├── Schemas/                    # Data models and schemas
-│   └── Tasks/                      # Background tasks and jobs
-│       └── task-invalidate-cache.1.0.0.json
-├── amorphie.config.json            # Domain configuration with exports
-├── package.json                    # NPM package configuration
-└── README.md                       # Project documentation
-```
-
-## ⚙️ Core Features
-
-### 🎯 Export-Controlled Domain Sharing
-
-Control what your domain exposes through `amorphie.config.json`:
-
-```json
-{
-  "domain": "identity",
-  "version": "1.0.0",
-  "exports": {
-    "functions": [
-      "calculate-credit-score.1.0.0.json",
-      "generate-user-id.1.1.0.json"
-    ],
-    "workflows": [
-      "user-registration.1.0.0.json"
-    ],
-    "tasks": [
-      "task-invalidate-cache.1.0.0.json"
-    ],
-    "visibility": "public",
-    "metadata": {
-      "description": "Identity management components",
-      "maintainer": "Identity Team"
-    }
-  },
-  "dependencies": {
-    "domains": ["@amorphie/domain-core-reference"],
-    "npm": []
-  }
-}
-```
-
-### 🔗 Reference Resolution System
-
-Use `ref` to reference components across domains:
-
-```json
-{
-  "key": "start-onboarding",
-  "domain": "onboarding", 
-  "tasks": [
-    {
-      "ref": "@amorphie/domain-core-reference/Tasks/task-invalidate-cache.1.0.0.json"
-    },
-    {
-      "ref": "Tasks/local-task.1.0.0.json"
-    }
-  ]
-}
-```
-
-**Local references:** `Tasks/task-name.1.0.0.json`  
-**External references:** `@amorphie/domain-core-reference/Tasks/task-name.1.0.0.json`
-
-> **Package Naming**: Reference packages use `-reference` suffix for cross-domain usage
-
-## 🛠️ CLI Commands
-
-### Domain Management
+### Setup Runtime Version
 
 ```bash
-# Create new domain project
-amorphie create [project-name]
-amp create [project-name]                # Short form
+# Enter project directory
+cd my-project
 
-# Validate domain components and resolve references
-amorphie validate --resolve-refs --strict
-amp validate --resolve-refs --strict     # Short form
+# Configure runtime version in amorphie.config.json
+# Set "runtimeVersion": "1.2.0" to match your target runtime
 
-# Validate single file
-amorphie validate path/to/component.json --resolve-refs
-amp validate path/to/component.json --resolve-refs     # Short form
+# Validate components (schema validation always enabled)
+amorphie validate
 
-# Build packages for different purposes
-amorphie build                           # Default: reference build
-amorphie build --type reference          # For cross-domain usage
-amorphie build --type runtime            # For engine deployment
-amp build --type runtime                 # Short form
-amorphie build --skip-validation         # Skip validation if needed
-
-# Publish packages to NPM
-amorphie publish --dry-run               # Test reference publish
-amorphie publish --type reference       # For cross-domain usage
-amorphie publish --type runtime         # For engine deployment
-amp publish --type runtime              # Short form
-amorphie publish --registry https://npm.amorphie.com
+# Schema package automatically downloaded and cached
+# ✅ Schema package 1.2.0 downloaded successfully (6 schema files)
 ```
 
-### Component Discovery
+### Template & Schema Management
 
 ```bash
-# List exports from current project
-amorphie list-exports
-amp list-exports                         # Short form
+# Template Management
+amorphie template-info          # Show template information
+amorphie template-versions      # List available template versions
+amorphie template-update        # Update template cache
+amorphie template-clear         # Clear template cache
 
-# List exports from external domain package
-amorphie list-exports @amorphie/domain-core-reference
-amp list-exports @amorphie/domain-core-reference   # Short form
-
-# Generate domain boundary visualization
-amorphie visualize-boundaries -f mermaid -o boundaries.md
-amp visualize-boundaries -f mermaid -o boundaries.md    # Short form
-amorphie visualize-boundaries -f json -o dependencies.json
-
-# Single file boundary visualization
-amorphie visualize-boundaries path/to/component.json -f json
-amp visualize-boundaries path/to/component.json -f json  # Short form
+# Schema Management  
+amorphie schema-info            # Show schema package information
+amorphie schema-versions        # List available schema versions
+amorphie schema-update          # Update schema cache
+amorphie schema-clear           # Clear schema cache
 ```
 
-## 🔍 Reference Resolution & Validation
+## 📋 Commands
 
-### Validate with Reference Resolution
+### Project Management
 
+#### `create [project-name]`
+Create a new Amorphie domain project
+
+**Options:**
+- `-v, --version <version>` - Template version (latest, v1.0.0, etc.) [default: latest]
+- `--list-versions` - List available template versions and exit
+- `--refresh-template` - Force refresh template cache
+
+**Examples:**
 ```bash
-# Validate all JSON files and resolve ref references
+amorphie create my-banking-project
+amorphie create my-project --version v1.5.0
+amorphie create --list-versions
+```
+
+#### `validate [file]`
+Validate domain components with schema validation (always enabled) and optional reference resolution
+
+**Behavior:**
+- **Schema Validation**: Always performed using runtime-specific schemas from NPM
+- **Reference Resolution**: Optional with `--resolve-refs` flag
+
+**Options:**
+- `--resolve-refs` - Resolve and validate all ref references
+- `--strict` - Enable strict validation mode
+
+**Examples:**
+```bash
+# Schema validation only (new default behavior)
+amorphie validate
+
+# Schema + reference validation
 amorphie validate --resolve-refs
-amp validate --resolve-refs              # Short form
 
-# Enable strict mode validation
-amorphie validate --resolve-refs --strict
-amp validate --resolve-refs --strict     # Short form
-
-# Validate single file
-amorphie validate identity/Workflows/login.json --resolve-refs
-amp validate identity/Workflows/login.json --resolve-refs     # Short form
-
-# Single file with strict validation
-amorphie validate identity/Functions/auth.json --resolve-refs --strict
-amp validate identity/Functions/auth.json --resolve-refs --strict     # Short form
+# Single file validation
+amorphie validate Workflows/my-workflow.1.0.0.json
 ```
 
-**What happens during validation:**
-1. ✅ Scans all JSON files in your domain
-2. ✅ Finds `ref` properties pointing to external components  
-3. ✅ Downloads referenced NPM packages to `.amorphie-cache`
-4. ✅ Checks if referenced components are exported by target domain
-5. ✅ Validates schema compatibility between versions
-6. ✅ Reports broken references and version conflicts
+#### `build`
+Build domain package with validation and reference resolution
 
-### Example Validation Output
+**Options:**
+- `-o, --output <dir>` - Output directory [default: dist]
+- `-t, --type <type>` - Build type: reference|runtime [default: reference]
+- `--skip-validation` - Skip schema validation
 
-```bash
-🔍 Validating domain components...
-📄 Validating: Workflows/sys-flows.1.0.0.json
-  ✅ Valid (3 refs resolved)
-📄 Validating: Tasks/task-invalidate-cache.1.0.0.json  
-  ✅ Valid (0 refs resolved)
+#### `publish`
+Publish domain package to NPM registry
 
-📊 Validation Summary:
-Files: 2/2 valid
-References: 3/3 resolved
-🎉 All validations passed!
-```
+**Options:**
+- `-t, --type <type>` - Publish type: reference|runtime [default: reference]
+- `--dry-run` - Show what would be published
+- `--registry <url>` - NPM registry URL
 
-### Single File Operations
+### Template Management
 
-Both `validate` and `visualize-boundaries` commands support single file operations for focused development:
+#### `template-info`
+Show template information and status
 
-#### Single File Validation
-```bash
-# Validate specific component
-amorphie validate identity/Workflows/user-registration.json --resolve-refs
-amp validate identity/Functions/calculate-score.json --resolve-refs
+**Options:**
+- `-v, --version <version>` - Template version to check [default: latest]
 
-# With strict mode
-amorphie validate identity/Tasks/cleanup.json --resolve-refs --strict
-```
+#### `template-versions`
+List all available template versions
 
-#### Single File Visualization
-```bash
-# Analyze single component dependencies
-amorphie visualize-boundaries identity/Workflows/login.json -f json
-# Creates: identity/Workflows/login-visualize.json
+#### `template-update`
+Update template cache (clear all cached versions)
 
-amorphie visualize-boundaries identity/Functions/auth.json -f mermaid
-# Creates: identity/Functions/auth-visualize.mermaid
-```
+#### `template-clear`
+Clear template cache completely
 
-**Smart Output Naming:**
-- **Global mode**: `{domain}.{format}` (e.g., `identity.json`)
-- **Single file mode**: `{filename}-visualize.{format}` (e.g., `login-visualize.json`)
+### Schema Management
 
-**Benefits:**
-- ✅ Faster development cycle - validate/analyze individual components
-- ✅ Focused debugging - isolate issues to specific files
-- ✅ Component-level dependency analysis
-- ✅ Automatic file naming prevents conflicts
+#### `schema-info`
+Show schema package information and status
 
-## 📦 Building & Distribution 
+**Options:**
+- `-v, --version <version>` - Schema version to check [default: latest]
 
-### Build Domain Package
+#### `schema-versions`
+List all available schema package versions
 
-```bash
-# Reference build (default) - for cross-domain usage
-amorphie build                      # Default: reference build
-amorphie build --type reference     # Explicit reference build
-amp build --type reference         # Short form
+#### `schema-update`
+Update schema cache (clear all cached versions)
 
-# Runtime build - for engine deployment
-amorphie build --type runtime       # Complete domain structure
-amp build --type runtime           # Short form
+#### `schema-clear`
+Clear schema cache completely
 
-# Custom options
-amorphie build -o custom-dist       # Custom output directory
-amorphie build --skip-validation    # Skip validation (not recommended)
-```
+### Analysis & Visualization
 
-#### Build Types
+#### `list-exports [package-name]`
+List exported components from a domain package
 
-**📦 Reference Build** (`--type reference`, default):
-- ✅ Only exported components (defined in `amorphie.config.json`)
-- ✅ Reference resolution: `ref` → payload objects
-- ✅ Minimal package for cross-domain usage
-- ✅ Package name: `{original-name}-reference`
-- ✅ Other domains can npm install and reference
+#### `visualize-boundaries [file]`
+Generate domain boundary visualization
 
-  **🚀 Runtime Build** (`--type runtime`):
-  - ✅ Complete domain structure (all files and folders)
-  - ✅ Reference resolution: `ref` → payload objects (same as reference build)
-  - ✅ Package name: `{original-name}-runtime`
-  - ✅ Ready for CI/CD deployment to engine
-- ✅ Includes internal components and supporting files
+**Options:**
+- `-f, --format <format>` - Output format: json|mermaid|dot [default: json]
+- `-o, --output <file>` - Output file path
 
-#### Build Process
-1. **Validation**: All components validated with schema validation
-2. **Type Processing**: Reference vs Runtime handling
-3. **Output Generation**: Deployment-ready package created
+## 🔬 Schema & Runtime Version Management
 
-**Reference Resolution Example** (Reference Build Only):
-```json
-// Before build (development):
-{
-  "task": {
-    "ref": "Tasks/task-invalidate-cache.1.0.0.json"
-  }
-}
+### Runtime Version Configuration
 
-// After reference build (deployment-ready):
-{
-  "task": {
-    "key": "task-invalidate-cache",
-    "version": "1.0.0",
-    "domain": "core",
-    "flow": "sys-tasks"
-  }
-}
-
-  // Runtime build also converts ref to payload for consistency
-  ```
-
-### Publish to NPM
-
-```bash
-# Publish reference package (default)
-amorphie publish --dry-run               # Test reference publish
-amorphie publish --type reference       # Explicit reference publish
-amp publish --type reference           # Short form
-
-# Publish runtime package
-amorphie publish --type runtime         # Complete runtime publish
-amp publish --type runtime             # Short form
-
-# Registry options
-amorphie publish --registry https://npm.amorphie.com
-amp publish --registry https://npm.amorphie.com    # Short form
-```
-
-**Publishing automatically builds the package with the specified type before publishing.**
-
-#### Package Naming Convention
-
-- **Reference Package**: `{your-package-name}-reference`
-- **Runtime Package**: `{your-package-name}-runtime`
-
-**Example**: If your `package.json` has `"name": "@amorphie/domain-identity"`, the published packages will be:
-- `@amorphie/domain-identity-reference` (for cross-domain usage)
-- `@amorphie/domain-identity-runtime` (for engine deployment)
-
-## 🗺️ Domain Boundary Visualization
-
-Generate visual representations of your domain dependencies:
-
-```bash
-# JSON format (default) - auto-generates: {domain}.json
-amorphie visualize-boundaries
-amp visualize-boundaries                 # Short form
-
-# Mermaid diagram - auto-generates: {domain}.mermaid
-amorphie visualize-boundaries -f mermaid
-amp visualize-boundaries -f mermaid     # Short form
-
-# DOT format for Graphviz - auto-generates: {domain}.dot
-amorphie visualize-boundaries -f dot
-amp visualize-boundaries -f dot         # Short form
-
-# Manual output file
-amorphie visualize-boundaries -f mermaid -o boundaries.md
-amp visualize-boundaries -f json -o dependencies.json
-
-# Single file boundary visualization
-amorphie visualize-boundaries identity/Workflows/login.json -f json
-# Creates: identity/Workflows/login-visualize.json
-amp visualize-boundaries identity/Functions/auth.json -f mermaid  
-# Creates: identity/Functions/auth-visualize.mermaid
-
-# Single file with manual output
-amorphie visualize-boundaries identity/Workflows/login.json -f json -o my-analysis.json
-```
-
-### Example Mermaid Output
-
-```mermaid
-graph TD
-  domain_core[@amorphie/domain-core]
-  domain_notifications[@amorphie/domain-notifications]
-  identity[identity]
-  
-  domain_core --> identity
-  domain_notifications --> identity
-```
-
-## 🔧 Advanced Configuration
-
-### Complete amorphie.config.json
+Projects use `runtimeVersion` in `amorphie.config.json` to determine which schema package version to use for validation:
 
 ```json
 {
+  "domain": "my-domain",
   "version": "1.0.0",
-  "description": "Identity Domain Components",
-  "domain": "identity",
-  "paths": {
-    "componentsRoot": "identity",
-    "tasks": "Tasks",
-    "workflows": "Workflows",
-    "functions": "Functions"
-  },
+  "runtimeVersion": "1.2.0",
+  "description": "My Amorphie Domain",
   "exports": {
-    "functions": ["calculate-risk.1.0.0.json"],
-    "workflows": ["user-flow.1.0.0.json"],
-    "tasks": ["cleanup-task.1.0.0.json"],
-    "visibility": "public",
-    "metadata": {
-      "description": "Identity management components",
-      "maintainer": "Identity Team",
-      "license": "MIT"
-    }
-  },
-  "dependencies": {
-    "domains": ["@amorphie/domain-core-reference"],
-    "npm": ["lodash@4.17.21"]
-  },
-  "referenceResolution": {
-    "enabled": true,
-    "validateOnBuild": true,
-    "strictMode": true,
-    "validateReferenceConsistency": true,
-    "validateSchemas": true,
-    "allowedHosts": [
-      "registry.npmjs.org",
-      "npm.amorphie.com"
-    ],
-    "schemaValidationRules": {
-      "enforceKeyFormat": true,
-      "enforceVersionFormat": true,
-      "enforceFilenameConsistency": true,
-      "allowUnknownProperties": false
-    }
+    "workflows": ["workflow-sample.1.0.0.json"],
+    "functions": ["function-sample.1.0.0.json"]
   }
 }
 ```
 
-## 💡 Best Practices
+### Schema Package Management
 
-### 1. Export Strategy
+- **Package Source**: NPM registry (`@amorphie/schema-definitions` by default)
+- **Version Binding**: Each `runtimeVersion` maps to specific schema definitions
+- **Cache System**: Downloaded schemas cached locally per version
+- **No Fallback**: NPM access required - no local schema fallback
+
+### Schema Validation Workflow
+
 ```bash
-✅ Export stable, versioned components
-✅ Use semantic versioning (1.0.0, 1.1.0, 2.0.0)
-✅ Document breaking changes
-❌ Don't export internal/private components
-❌ Don't export components under active development
+# 1. Set runtime version in amorphie.config.json
+echo '{"runtimeVersion": "1.2.0"}' > amorphie.config.json
+
+# 2. Run validation - schemas automatically downloaded for runtime version
+amorphie validate
+
+# 3. Schemas cached for future use
+# Cache location: ~/.cache/amorphie-cli/schemas/1.2.0/
 ```
 
-### 2. Reference Usage
+### Schema Management Commands
+
 ```bash
-✅ Pin to specific versions: task-name.1.0.0.json
-✅ Use local refs for same-domain components
-✅ Test reference resolution regularly
-❌ Don't use latest or floating versions
-❌ Don't create circular dependencies
+# Check current schema package status
+amorphie schema-info
+# Output:
+# Package: @amorphie/schema-definitions
+# Current Version: 1.2.0
+# Cached: Yes
+# Schema Files: 6 files
+
+# List available schema versions
+amorphie schema-versions
+
+# Update schema cache
+amorphie schema-update
+
+# Clear schema cache
+amorphie schema-clear
 ```
 
-### 3. Domain Boundaries
-```bash
-✅ Keep domains focused and cohesive
-✅ Minimize cross-domain dependencies
-✅ Use events/messages for loose coupling
-❌ Don't create tightly coupled domains
-❌ Don't share database schemas directly
+## 🏗️ Template System
+
+### Template Repository
+
+Templates are hosted in a separate Git repository with semantic versioning:
+- Repository: `https://github.com/amorphie/Amorphie.Template`
+- Versioning: Git tags (v1.0.0, v1.1.0, etc.)
+- Built-in authentication with secure token management
+
+### Template Structure
+
+```
+amorphie-template/
+├── {domainName}/           # Domain folder (replaced with actual domain name)
+│   ├── Tasks/             # Task definitions
+│   ├── Workflows/         # Workflow definitions  
+│   ├── Functions/         # Function definitions
+│   ├── Views/             # View definitions
+│   ├── Schemas/           # Schema definitions
+│   └── Extensions/        # Extension definitions
+├── .vscode/               # VSCode configurations
+│   ├── schemas/          # JSON schemas
+│   ├── scripts/          # Validation scripts
+│   └── settings.json     # Editor settings
+├── amorphie.config.json   # Amorphie configuration
+├── package.json          # Package configuration
+├── .gitignore            # Git ignore rules
+├── .cursorrules          # Cursor AI rules
+└── README.md             # Project documentation
 ```
 
-## 🚀 Development Workflow
+### Placeholder Replacement
 
-1. **Create Domain Project**
-   ```bash
-   amorphie create identity-service
-   # or amp create identity-service
-   cd identity-service
-   npm install
-   ```
+The CLI automatically replaces these placeholders:
+- `{packageName}` → Project name
+- `{domainName}` → Domain name (lowercase, hyphen-separated)
 
-2. **Develop Components**
-   ```bash
-   # Edit domain components in your-domain/ folder
-   # Use ref for cross-domain references
-   ```
-
-3. **Validate & Test**
-   ```bash
-   # Validate all components
-   amorphie validate --resolve-refs
-   # or amp validate --resolve-refs
-   
-   # Validate single file during development
-   amorphie validate identity/Workflows/login.json --resolve-refs
-   # or amp validate identity/Workflows/login.json --resolve-refs
-   
-   # Visualize all domain boundaries
-   amorphie visualize-boundaries -f json
-   # or amp visualize-boundaries -f json
-   
-   # Visualize single component dependencies
-   amorphie visualize-boundaries identity/Workflows/login.json -f json
-   # or amp visualize-boundaries identity/Workflows/login.json -f json
-   ```
-
-4. **Prepare for Publishing**
-   ```bash
-   # For cross-domain reference
-   amorphie build --type reference
-   # or amp build --type reference
-   amorphie publish --dry-run --type reference
-   
-   # For engine deployment
-   amorphie build --type runtime
-   # or amp build --type runtime
-   amorphie publish --dry-run --type runtime
-   ```
-
-5. **Publish to NPM**
-   ```bash
-   # Reference package for other domains
-   amorphie publish --type reference
-   
-   # Runtime package for deployment
-   amorphie publish --type runtime
-   ```
-
-## 🎯 Use Cases
-
-### Enterprise Domain Architecture
-- **Identity Domain**: User management, authentication
-- **Billing Domain**: Invoicing, payments, subscriptions  
-- **Onboarding Domain**: User registration, KYC processes
-- **Core Domain**: Shared utilities, common tasks
-
-### Component Reuse Scenarios
-- ✅ Billing domain installs `@amorphie/identity-reference` for user validation
-- ✅ Onboarding domain uses `@amorphie/core-reference` for cache invalidation
-- ✅ All domains use `@amorphie/core-reference` for audit logging tasks
-- ✅ Notification domain publishes `@amorphie/notifications-reference` for messaging
-
-### Package Distribution Strategy
-- **Reference Packages** (`-reference` suffix): For cross-domain dependencies
-- **Runtime Packages** (`-runtime` suffix): For engine deployment via CI/CD
-
-## 🛠️ Contributing
+### Version Management
 
 ```bash
-git clone https://github.com/amorphie/cli
-cd cli
+# Always uses latest version
+amorphie create my-project
+
+# Use specific version
+amorphie create my-project --version v2.0.0
+
+# List available versions
+amorphie template-versions
+# Output:
+#   v2.1.0 (latest)
+#   v2.0.0
+#   v1.5.0
+#   v1.0.0
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+```bash
+# Template Configuration
+export AMORPHIE_TEMPLATE_REPO="https://github.com/amorphie/Amorphie.Template.git"
+export AMORPHIE_TEMPLATE_TOKEN="your-custom-token"
+
+# Schema Package Configuration  
+export AMORPHIE_SCHEMA_PACKAGE="@amorphie/schema-definitions"
+export AMORPHIE_NPM_REGISTRY="https://npm.pkg.github.com"
+
+# Cache Configuration
+export AMORPHIE_CACHE_DIR="/custom/cache/path"
+```
+
+### NPM Registry Authentication
+
+For GitHub Package Registry or private NPM registries:
+
+```bash
+# Method 1: NPM Config
+npm config set @amorphie:registry https://npm.pkg.github.com
+npm config set //npm.pkg.github.com/:_authToken YOUR_GITHUB_TOKEN
+
+# Method 2: .npmrc file
+echo "@amorphie:registry=https://npm.pkg.github.com" >> ~/.npmrc
+echo "//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN" >> ~/.npmrc
+```
+
+### Cache Structure
+
+Both templates and schemas are cached locally:
+
+```
+# Template Cache
+.amorphie-template-cache/
+├── template-v2.1.0/       # Latest template version
+├── template-v2.0.0/       # Older template version
+└── temp-for-tags/         # Temporary tag fetching
+
+# Schema Cache (System Cache Directory)
+~/.cache/amorphie-cli/schemas/
+├── 1.2.0/
+│   ├── package.json
+│   └── schemas/
+│       ├── workflow-definition.schema.json
+│       ├── function-definition.schema.json
+│       ├── task-definition.schema.json
+│       ├── view-definition.schema.json
+│       ├── schema-definition.schema.json
+│       └── extension-definition.schema.json
+├── 1.1.0/
+├── npm-cache/             # NPM download cache
+└── temp/                  # Temporary download files
+```
+
+## 📝 Example Usage
+
+### Complete Workflow
+
+```bash
+# 1. Create new project with latest template
+amorphie create banking-core
+
+# 2. Enter project directory
+cd banking-core
+
+# 3. Configure runtime version in amorphie.config.json
+# Edit: "runtimeVersion": "1.2.0"
+
+# 4. Install dependencies
 npm install
-npm link  # Makes amorphie available globally
 
-# Test the CLI
-amorphie create test-domain
+# 5. Validate components (schema validation always included)
+amorphie validate
+# Or with reference resolution:
+amorphie validate --resolve-refs
+
+# 6. Build reference package
+amorphie build --type reference
+
+# 7. Publish to registry
+amorphie publish --type reference
 ```
 
-## 📚 Resources
+### Template Management Workflow
 
-- [JSON Schema Validation](https://json-schema.org/)
+```bash
+# Check current template status
+amorphie template-info
+# Repository: https://github.com/amorphie/Amorphie.Template.git
+# Current Version: v2.1.0
+# Available Versions: v2.1.0 (latest), v2.0.0, v1.5.0...
+
+# Update template cache
+amorphie template-update
+
+# Create project with specific version
+amorphie create legacy-project --version v1.5.0
+```
+
+## 🔍 Validation & References
+
+The CLI provides comprehensive validation with a two-layer approach:
+
+### Schema Validation (Always Active)
+- **Runtime-Specific Schemas**: Uses schemas from NPM package matching `runtimeVersion`
+- **Automatic Download**: Schemas downloaded and cached automatically
+- **Comprehensive Coverage**: All component types validated (workflows, functions, tasks, views, schemas, extensions)
+- **Strict Validation**: Properties, types, required fields, and format validation
+- **No Fallback**: NPM access required - ensures consistent validation across environments
+
+### Reference Resolution (Optional with `--resolve-refs`)
+- **Cross-Domain References**: External package references resolved and validated
+- **Local References**: Internal domain references validated
+- **Integrity Checking**: Referenced components must exist and be accessible
+- **Version Consistency**: Reference versions validated against target components
+
+### Additional Validations
+- **Filename Consistency**: Component keys match filenames
+- **Version Consistency**: Semantic versioning compliance
+- **Domain Boundaries**: Domain-specific validation rules
+
+### Reference Format
+
+```json
+{
+  "ref": "@amorphie/core-domain/Tasks/task-validate-user.1.0.0.json"
+}
+```
+
+## 📊 Build Types
+
+### Reference Package
+- Contains only exported components
+- Optimized for cross-domain usage
+- References resolved to payloads
+
+### Runtime Package  
+- Contains complete domain structure
+- Optimized for engine deployment
+- All supporting files included
+
+## 🚀 Advanced Features
+
+### Multiple Template Versions
+```bash
+# Development with cutting-edge features
+amorphie create dev-project --version v3.0.0-beta
+
+# Production with stable version
+amorphie create prod-project --version v2.1.0
+
+# Legacy support
+amorphie create legacy-project --version v1.0.0
+```
+
+### Visualization
+```bash
+# Generate domain boundary diagram
+amorphie visualize-boundaries --format mermaid --output domain-map.md
+
+# Analyze component dependencies
+amorphie visualize-boundaries MyComponent.json --format json
+```
+
+## 🐛 Troubleshooting
+
+### Template Issues
+
+```bash
+# Clear cache and re-download
+amorphie template-clear
+amorphie create my-project --refresh-template
+
+# Check available versions
+amorphie template-versions
+
+# Get detailed template info
+amorphie template-info --version latest
+```
+
+### Schema Package Issues
+
+```bash
+# Check schema package status
+amorphie schema-info
+
+# Clear schema cache and re-download
+amorphie schema-clear
+amorphie validate
+
+# List available schema versions
+amorphie schema-versions
+
+# NPM cache issues
+npm cache clean --force
+amorphie validate
+```
+
+### Authentication Issues (GitHub Package Registry)
+
+```bash
+# Set up authentication
+npm config set @amorphie:registry https://npm.pkg.github.com
+npm config set //npm.pkg.github.com/:_authToken YOUR_GITHUB_TOKEN
+
+# Verify authentication
+npm whoami --registry https://npm.pkg.github.com
+
+# Test package access
+npm view @amorphie/schema-definitions --registry https://npm.pkg.github.com
+```
+
+### Common Error Messages
+
+#### "NPM command failed: permission denied"
+```bash
+# Solution: Set up GitHub authentication
+npm config set //npm.pkg.github.com/:_authToken YOUR_GITHUB_TOKEN
+```
+
+#### "NPM cache conflict"
+```bash
+# Solution: Clear NPM cache
+npm cache clean --force
+amorphie validate
+```
+
+#### "Schema package not found"
+```bash
+# Solution: Check package name and registry
+amorphie schema-info
+# Verify: AMORPHIE_SCHEMA_PACKAGE and AMORPHIE_NPM_REGISTRY
+```
+
+### Validation Errors
+
+```bash
+# Schema validation with detailed error reporting
+amorphie validate
+
+# Schema + reference validation
+amorphie validate --resolve-refs --strict
+
+# Single component validation
+amorphie validate MyComponent.json
+
+# Verbose validation output
+amorphie validate --resolve-refs
+```
+
+### Performance Issues
+
+```bash
+# Check cache sizes
+du -sh ~/.cache/amorphie-cli/
+du -sh .amorphie-template-cache/
+
+# Clean up old cache entries
+amorphie schema-clear
+amorphie template-clear
+```
 
 ## 📄 License
 
-MIT License
-
----
-
-**🚀 Built for modern domain-driven architecture with ❤️ by the Amorphie Team** 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

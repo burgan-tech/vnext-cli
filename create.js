@@ -6,6 +6,8 @@ const { program } = require('commander');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const RefResolver = require('./lib/ref-resolver');
+const TemplateManager = require('./lib/template-manager');
+const SchemaManager = require('./lib/schema-manager');
 const packageJson = require('./package.json');
 
 program
@@ -17,10 +19,34 @@ program
 program
   .command('create [project-name]')
   .description('Create a new Amorphie domain project')
-  .action(async (projectName) => {
+  .option('-v, --version <version>', 'Template version to use (latest, v1.0.0, etc.)', 'latest')
+  .option('--list-versions', 'List available template versions and exit')
+  .option('--refresh-template', 'Force refresh template cache')
+  .action(async (projectName, options) => {
     try {
+      // Initialize template manager
+      const templateManager = new TemplateManager();
+      
+      // List versions and exit if requested
+      if (options.listVersions) {
+        console.log(chalk.blue('📋 Available template versions:'));
+        try {
+          const versions = await templateManager.listAvailableVersions();
+          if (versions.length === 0) {
+            console.log(chalk.gray('  No versions found'));
+          } else {
+            versions.forEach((version, index) => {
+              const marker = index === 0 ? chalk.green(' (latest)') : '';
+              console.log(`  ${version}${marker}`);
+            });
+          }
+        } catch (error) {
+          console.log(chalk.red(`Error listing versions: ${error.message}`));
+        }
+        return;
+      }
+      
       let name = projectName;
-      let domainName;
       
       // Get project name if not provided
       if (!name) {
@@ -40,27 +66,15 @@ program
         name = answers.projectName;
       }
 
-      // Get domain name
-      const domainAnswers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'domainName',
-          message: 'What is your domain name? (lowercase letters and hyphens only):',
-          validate: (input) => {
-            if (input.trim() === '') {
-              return 'Domain name is required';
-            }
-            // Regex: lowercase letters and hyphens only
-            const domainRegex = /^[a-z]+(-[a-z]+)*$/;
-            if (!domainRegex.test(input.trim())) {
-              return 'Domain name must contain only lowercase letters and hyphens (e.g., "core", "user-management")';
-            }
-            return true;
-          },
-          filter: (input) => input.trim().toLowerCase()
-        }
-      ]);
-      domainName = domainAnswers.domainName;
+      // Convert project name to domain name format (lowercase, hyphen-separated)
+      const domainName = convertToDomainFormat(name);
+      
+      // Show domain conversion to user
+      if (domainName !== name) {
+        console.log(chalk.blue(`📝 Domain name: "${name}" → "${domainName}" (formatted for domain usage)`));
+      } else {
+        console.log(chalk.blue(`📝 Domain name: "${domainName}"`));
+      }
 
       const targetPath = path.join(process.cwd(), name);
       
@@ -73,9 +87,17 @@ program
       // Create project directory
       await fs.ensureDir(targetPath);
       
-      // Copy template files
-      const templatePath = path.join(__dirname, 'template');
-      await copyTemplate(templatePath, targetPath, name, domainName);
+      // Force refresh template cache if requested
+      if (options.refreshTemplate) {
+        await templateManager.updateTemplate();
+      }
+      
+      // Ensure template is available (download specific version if not cached)
+      console.log(chalk.blue(`🔖 Using template version: ${options.version}`));
+      await templateManager.ensureTemplate(options.version);
+      
+      // Copy template files with Git-based template
+      await templateManager.copyTemplate(targetPath, name, domainName);
       
       console.log(chalk.green(`✅ Successfully created ${name}`));
       console.log(chalk.blue('📁 Project structure:'));
@@ -93,6 +115,10 @@ program
 ├── README.md
 └── package.json
       `);
+      
+      console.log(chalk.blue(`\n📋 Template Info:`));
+      console.log(`Template Version: ${templateManager.currentVersion}`);
+      console.log(`Repository: ${templateManager.options.templateRepo}`);
       
       console.log(chalk.yellow('\n🚀 Next steps:'));
       console.log(`  cd ${name}`);
@@ -125,12 +151,30 @@ program
 
       const config = await fs.readJSON(configPath);
       
-      // Create resolver with config-based options
+      // Initialize schema manager and get schema path for runtime version
+      const schemaManager = new SchemaManager();
+      let schemaPath;
+      
+      try {
+        schemaPath = await schemaManager.ensureSchemasForConfig(configPath);
+        console.log(chalk.green(`🔖 Using schemas from runtime version: ${schemaManager.currentVersion}`));
+      } catch (error) {
+        console.log(chalk.red(`❌ Failed to load runtime schemas: ${error.message}`));
+        console.log(chalk.red(`❌ Schema validation requires NPM access to download schema package.`));
+        console.log(chalk.yellow(`💡 Possible solutions:`));
+        console.log(chalk.yellow(`   - Check your internet connection`));
+        console.log(chalk.yellow(`   - Verify NPM registry access: ${schemaManager.options.npmRegistry}`));
+        console.log(chalk.yellow(`   - Check schema package exists: ${schemaManager.options.schemaPackageName}`));
+        console.log(chalk.yellow(`   - Ensure write permissions to cache directory: ${schemaManager.schemaCacheDir}`));
+        process.exit(1);
+      }
+      
+      // Create resolver with config-based options and dynamic schema path
       const resolver = new RefResolver({
         strictMode: options.strict || config.referenceResolution?.strictMode,
         validateReferenceConsistency: config.referenceResolution?.validateReferenceConsistency !== false,
         validateSchemas: config.referenceResolution?.validateSchemas !== false,
-        schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+        schemaPath: schemaPath
       });
       
       // Load additional config
@@ -140,6 +184,8 @@ program
       let validFiles = 0;
       let totalRefs = 0;
       let validRefs = 0;
+      let schemaValidationPassed = 0;
+      let schemaValidationFailed = 0;
 
       let jsonFiles = [];
       
@@ -172,15 +218,28 @@ program
           const content = await fs.readJSON(filePath);
           console.log(chalk.gray(`📄 Validating: ${path.relative(process.cwd(), filePath)}`));
           
+          // Always perform schema validation
+          let fileSchemaValid = true;
+          try {
+            await resolver.validateComponentSchema(content, path.relative(process.cwd(), filePath));
+            console.log(chalk.green(`  ✅ Schema validation passed`));
+            schemaValidationPassed++;
+          } catch (error) {
+            fileSchemaValid = false;
+            console.log(chalk.red(`  ❌ Schema validation failed: ${error.message}`));
+            schemaValidationFailed++;
+          }
+          
+          // Perform reference resolution if requested
           if (options.resolveRefs) {
             const validation = await resolver.validateAllReferences(content, config.domain);
             
             totalRefs += validation.resolvedRefs.length;
             validRefs += validation.resolvedRefs.filter(r => r.status === 'success').length;
             
-            if (validation.valid) {
+            if (validation.valid && fileSchemaValid) {
               validFiles++;
-              console.log(chalk.green(`  ✅ Valid (${validation.validationDetails.successful}/${validation.validationDetails.total} refs resolved)`));
+              console.log(chalk.green(`  ✅ Complete validation passed (${validation.validationDetails.successful}/${validation.validationDetails.total} refs resolved)`));
               
               // Show detailed validation info in verbose mode
               if (validation.validationDetails.total > 0) {
@@ -191,15 +250,18 @@ program
                 });
               }
             } else {
-              console.log(chalk.red(`  ❌ Validation failed (${validation.validationDetails.failed}/${validation.validationDetails.total} refs failed):`));
-              validation.errors.forEach(error => {
-                console.log(chalk.red(`    - ${error.ref}:`));
-                console.log(chalk.red(`      ${error.error}`));
-              });
+              if (!validation.valid) {
+                console.log(chalk.red(`  ❌ Reference validation failed (${validation.validationDetails.failed}/${validation.validationDetails.total} refs failed):`));
+                validation.errors.forEach(error => {
+                  console.log(chalk.red(`    - ${error.ref}:`));
+                  console.log(chalk.red(`      ${error.error}`));
+                });
+              }
             }
           } else {
-            validFiles++;
-            console.log(chalk.green('  ✅ Valid JSON syntax'));
+            if (fileSchemaValid) {
+              validFiles++;
+            }
           }
         } catch (error) {
           console.log(chalk.red(`  ❌ Error: ${error.message}`));
@@ -208,14 +270,25 @@ program
 
       console.log(chalk.blue('\n📊 Validation Summary:'));
       console.log(`Files: ${validFiles}/${totalFiles} valid`);
+      console.log(`Schema Validation: ${schemaValidationPassed}/${schemaValidationPassed + schemaValidationFailed} passed`);
       if (options.resolveRefs) {
         console.log(`References: ${validRefs}/${totalRefs} resolved`);
       }
       
-      if (validFiles === totalFiles && validRefs === totalRefs) {
+      const allValidationsPassed = validFiles === totalFiles && 
+                                   schemaValidationFailed === 0 && 
+                                   (options.resolveRefs ? validRefs === totalRefs : true);
+      
+      if (allValidationsPassed) {
         console.log(chalk.green('🎉 All validations passed!'));
       } else {
         console.log(chalk.yellow('⚠️  Some validations failed. Check the output above.'));
+        if (schemaValidationFailed > 0) {
+          console.log(chalk.red(`❌ ${schemaValidationFailed} files failed schema validation`));
+        }
+        if (options.resolveRefs && validRefs < totalRefs) {
+          console.log(chalk.red(`❌ ${totalRefs - validRefs} references failed to resolve`));
+        }
         process.exit(1);
       }
 
@@ -255,11 +328,29 @@ program
       if (!options.skipValidation) {
         console.log(chalk.blue('\n📋 Step 1: Validating components...'));
         
+        // Initialize schema manager and get schema path for runtime version
+        const schemaManager = new SchemaManager();
+        let schemaPath;
+        
+        try {
+          schemaPath = await schemaManager.ensureSchemasForConfig(configPath);
+          console.log(chalk.green(`🔖 Using schemas from runtime version: ${schemaManager.currentVersion}`));
+        } catch (error) {
+          console.log(chalk.red(`❌ Failed to load runtime schemas: ${error.message}`));
+          console.log(chalk.red(`❌ Build process requires NPM access to download schema package.`));
+          console.log(chalk.yellow(`💡 Possible solutions:`));
+          console.log(chalk.yellow(`   - Check your internet connection`));
+          console.log(chalk.yellow(`   - Verify NPM registry access: ${schemaManager.options.npmRegistry}`));
+          console.log(chalk.yellow(`   - Check schema package exists: ${schemaManager.options.schemaPackageName}`));
+          console.log(chalk.yellow(`   - Ensure write permissions to cache directory: ${schemaManager.schemaCacheDir}`));
+          process.exit(1);
+        }
+        
         const resolver = new RefResolver({
           strictMode: config.referenceResolution?.strictMode,
           validateReferenceConsistency: config.referenceResolution?.validateReferenceConsistency !== false,
           validateSchemas: config.referenceResolution?.validateSchemas !== false,
-          schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+          schemaPath: schemaPath
         });
         
         await resolver.loadValidationConfig(configPath);
@@ -339,8 +430,20 @@ program
       if (options.type === 'reference') {
         console.log(chalk.blue('\n🔗 Step 3: Processing exported components with reference resolution...'));
         
+        // Initialize schema manager for reference resolution
+        const schemaManager = new SchemaManager();
+        let schemaPath;
+        
+        try {
+          schemaPath = await schemaManager.ensureSchemasForConfig(configPath);
+        } catch (error) {
+          console.log(chalk.red(`❌ Failed to load runtime schemas: ${error.message}`));
+          console.log(chalk.red(`❌ Reference build requires NPM access to download schema package.`));
+          process.exit(1);
+        }
+        
         const resolver = new RefResolver({
-          schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+          schemaPath: schemaPath
         });
         await resolver.loadValidationConfig(configPath);
 
@@ -376,8 +479,20 @@ program
       } else if (options.type === 'runtime') {
         console.log(chalk.blue('\n📁 Step 3: Processing complete domain structure with reference resolution...'));
         
+        // Initialize schema manager for runtime resolution
+        const schemaManager = new SchemaManager();
+        let schemaPath;
+        
+        try {
+          schemaPath = await schemaManager.ensureSchemasForConfig(configPath);
+        } catch (error) {
+          console.log(chalk.red(`❌ Failed to load runtime schemas: ${error.message}`));
+          console.log(chalk.red(`❌ Runtime build requires NPM access to download schema package.`));
+          process.exit(1);
+        }
+        
         const resolver = new RefResolver({
-          schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+          schemaPath: schemaPath
         });
         await resolver.loadValidationConfig(configPath);
         
@@ -574,6 +689,219 @@ program
     }
   });
 
+// Template management commands
+program
+  .command('template-info')
+  .description('Show template information and status')
+  .option('-v, --version <version>', 'Template version to check (default: latest)', 'latest')
+  .action(async (options) => {
+    try {
+      const templateManager = new TemplateManager();
+      
+      console.log(chalk.blue('📋 Template Information:'));
+      
+      const info = await templateManager.getTemplateInfo(options.version);
+      
+      console.log(`Repository: ${info.repository}`);
+      console.log(`Current Version: ${info.version}`);
+      console.log(`Cache Path: ${info.path}`);
+      console.log(`Cached: ${info.exists ? chalk.green('Yes') : chalk.red('No')}`);
+      
+      if (info.availableVersions.length > 0) {
+        console.log(chalk.blue('\n🏷️  Available Versions:'));
+        info.availableVersions.forEach((version, index) => {
+          const marker = index === 0 ? chalk.green(' (latest)') : '';
+          const current = version === info.version ? chalk.yellow(' (current)') : '';
+          console.log(`  ${version}${marker}${current}`);
+        });
+      }
+      
+      if (info.config) {
+        console.log(chalk.blue('\n📦 Template Config:'));
+        console.log(`Version: ${info.config.version}`);
+        console.log(`Description: ${info.config.description}`);
+        console.log(`Domain: ${info.config.domain}`);
+      }
+      
+      if (info.packageJson) {
+        console.log(chalk.blue('\n📄 Package Info:'));
+        console.log(`Name: ${info.packageJson.name}`);
+        console.log(`Version: ${info.packageJson.version}`);
+      }
+      
+    } catch (error) {
+      console.error(chalk.red('Error getting template info:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('template-update')
+  .description('Update template cache (clear all cached versions)')
+  .action(async () => {
+    try {
+      const templateManager = new TemplateManager();
+      
+      console.log(chalk.blue('🔄 Updating template cache...'));
+      await templateManager.updateTemplate();
+      console.log(chalk.green('✅ Template cache updated successfully'));
+      
+    } catch (error) {
+      console.error(chalk.red('Error updating template:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('template-versions')
+  .description('List all available template versions')
+  .action(async () => {
+    try {
+      const templateManager = new TemplateManager();
+      
+      console.log(chalk.blue('📋 Available template versions:'));
+      const versions = await templateManager.listAvailableVersions();
+      
+      if (versions.length === 0) {
+        console.log(chalk.gray('  No versions found'));
+      } else {
+        versions.forEach((version, index) => {
+          const marker = index === 0 ? chalk.green(' (latest)') : '';
+          console.log(`  ${version}${marker}`);
+        });
+      }
+      
+    } catch (error) {
+      console.error(chalk.red('Error listing versions:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('template-clear')
+  .description('Clear template cache')
+  .action(async () => {
+    try {
+      const templateManager = new TemplateManager();
+      await templateManager.clearCache();
+      
+    } catch (error) {
+      console.error(chalk.red('Error clearing template cache:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Schema management commands
+program
+  .command('schema-info')
+  .description('Show schema package information and status')
+  .option('-v, --version <version>', 'Schema version to check (default: latest)', 'latest')
+  .action(async (options) => {
+    try {
+      const schemaManager = new SchemaManager();
+      
+      console.log(chalk.blue('📋 Schema Package Information:'));
+      
+      const info = await schemaManager.getSchemaInfo(options.version);
+      
+      console.log(`Package: ${info.packageName}`);
+      console.log(`Current Version: ${info.version}`);
+      console.log(`Cache Path: ${info.path}`);
+      console.log(`Cached: ${info.exists ? chalk.green('Yes') : chalk.red('No')}`);
+      
+      if (info.availableVersions.length > 0) {
+        console.log(chalk.blue('\n🏷️  Available Versions:'));
+        info.availableVersions.slice(0, 10).forEach((version, index) => {
+          const marker = index === 0 ? chalk.green(' (latest)') : '';
+          const current = version === info.version ? chalk.yellow(' (current)') : '';
+          console.log(`  ${version}${marker}${current}`);
+        });
+        
+        if (info.availableVersions.length > 10) {
+          console.log(chalk.gray(`  ... and ${info.availableVersions.length - 10} more versions`));
+        }
+      }
+      
+      if (info.packageJson) {
+        console.log(chalk.blue('\n📄 Package Info:'));
+        console.log(`Name: ${info.packageJson.name}`);
+        console.log(`Version: ${info.packageJson.version}`);
+        console.log(`Description: ${info.packageJson.description || 'No description'}`);
+      }
+      
+      if (info.schemaFiles && info.schemaFiles.length > 0) {
+        console.log(chalk.blue('\n📄 Schema Files:'));
+        info.schemaFiles.forEach(file => {
+          console.log(`  ${file}`);
+        });
+      }
+      
+    } catch (error) {
+      console.error(chalk.red('Error getting schema info:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('schema-update')
+  .description('Update schema cache (clear all cached versions)')
+  .action(async () => {
+    try {
+      const schemaManager = new SchemaManager();
+      
+      console.log(chalk.blue('🔄 Updating schema cache...'));
+      await schemaManager.updateSchemas();
+      console.log(chalk.green('✅ Schema cache updated successfully'));
+      
+    } catch (error) {
+      console.error(chalk.red('Error updating schema cache:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('schema-versions')
+  .description('List all available schema package versions')
+  .action(async () => {
+    try {
+      const schemaManager = new SchemaManager();
+      
+      console.log(chalk.blue('📋 Available schema package versions:'));
+      const versions = await schemaManager.listAvailableVersions();
+      
+      if (versions.length === 0) {
+        console.log(chalk.gray('  No versions found'));
+      } else {
+        versions.slice(0, 20).forEach((version, index) => {
+          const marker = index === 0 ? chalk.green(' (latest)') : '';
+          console.log(`  ${version}${marker}`);
+        });
+        
+        if (versions.length > 20) {
+          console.log(chalk.gray(`  ... and ${versions.length - 20} more versions`));
+        }
+      }
+      
+    } catch (error) {
+      console.error(chalk.red('Error listing schema versions:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('schema-clear')
+  .description('Clear schema cache')
+  .action(async () => {
+    try {
+      const schemaManager = new SchemaManager();
+      await schemaManager.clearCache();
+      
+    } catch (error) {
+      console.error(chalk.red('Error clearing schema cache:'), error.message);
+      process.exit(1);
+    }
+  });
+
 // Visualize boundaries command
 program
   .command('visualize-boundaries [file]')
@@ -726,79 +1054,24 @@ program
   });
 
 // Helper functions (existing and new)
-async function copyTemplate(templatePath, targetPath, projectName, domainName) {
-  const items = await fs.readdir(templatePath);
-  
-  console.log('📂 Files found in template:', items);
-  console.log('🔍 Hidden files:', items.filter(item => item.startsWith('.')));
-  
-  for (const item of items) {
-    const sourcePath = path.join(templatePath, item);
-    const stat = await fs.stat(sourcePath);
-    
-    if (stat.isDirectory()) {
-      if (item === '{domainName}') {
-        const actualTargetPath = path.join(targetPath, domainName);
-        await copyDirectoryRecursive(sourcePath, actualTargetPath, projectName, domainName);
-      } else {
-        const targetItemPath = path.join(targetPath, item);
-        await copyDirectoryRecursive(sourcePath, targetItemPath, projectName, domainName);
-      }
-    } else {
-      const targetItemPath = path.join(targetPath, item);
-      console.log(`📄 Copying file: ${item}`);
-      await copyFileWithPlaceholders(sourcePath, targetItemPath, projectName, domainName);
-    }
-  }
-  
-  const criticalFiles = ['.gitignore', '.cursorrules'];
-  for (const file of criticalFiles) {
-    const sourcePath = path.join(templatePath, file);
-    const targetPath_file = path.join(targetPath, file);
-    
-    if (await fs.pathExists(sourcePath) && !(await fs.pathExists(targetPath_file))) {
-      console.log(`⚠️  Missing critical file ${file}, copying now...`);
-      await copyFileWithPlaceholders(sourcePath, targetPath_file, projectName, domainName);
-    }
-  }
-}
 
-async function copyDirectoryRecursive(sourcePath, targetPath, projectName, domainName) {
-  await fs.ensureDir(targetPath);
-  
-  const items = await fs.readdir(sourcePath);
-  
-  for (const item of items) {
-    const sourceItemPath = path.join(sourcePath, item);
-    const targetItemPath = path.join(targetPath, item);
-    const stat = await fs.stat(sourceItemPath);
-    
-    if (stat.isDirectory()) {
-      await copyDirectoryRecursive(sourceItemPath, targetItemPath, projectName, domainName);
-    } else {
-      await copyFileWithPlaceholders(sourceItemPath, targetItemPath, projectName, domainName);
-    }
-  }
-}
-
-async function copyFileWithPlaceholders(sourcePath, targetPath, projectName, domainName) {
-  const extname = path.extname(sourcePath);
-  
-  const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.otf', '.exe', '.dll', '.so', '.dylib'];
-  
-  if (binaryExtensions.includes(extname.toLowerCase())) {
-    await fs.copy(sourcePath, targetPath);
-    return;
-  }
-  
-  try {
-    let content = await fs.readFile(sourcePath, 'utf8');
-    content = content.replace(/{packageName}/g, projectName);
-    content = content.replace(/{domainName}/g, domainName);
-    await fs.writeFile(targetPath, content);
-  } catch (error) {
-    await fs.copy(sourcePath, targetPath);
-  }
+/**
+ * Convert project name to domain format
+ * @param {string} projectName - Original project name
+ * @returns {string} Domain-formatted name
+ */
+function convertToDomainFormat(projectName) {
+  return projectName
+    .trim()
+    .toLowerCase()
+    // Replace spaces and underscores with hyphens
+    .replace(/[\s_]+/g, '-')
+    // Remove non-alphanumeric characters except hyphens
+    .replace(/[^a-z0-9-]/g, '')
+    // Remove multiple consecutive hyphens
+    .replace(/-+/g, '-')
+    // Remove leading/trailing hyphens
+    .replace(/^-+|-+$/g, '');
 }
 
 async function findJsonFiles(dirPath) {
@@ -950,12 +1223,21 @@ async function buildPackage(outputDir, type = 'reference') {
 
   const config = await fs.readJSON(configPath);
   
-  // Run validation
+  // Run validation with runtime-specific schemas
+  const schemaManager = new SchemaManager();
+  let schemaPath;
+  
+  try {
+    schemaPath = await schemaManager.ensureSchemasForConfig(configPath);
+  } catch (error) {
+    throw new Error(`Schema validation failed: ${error.message}. NPM access required to download schema package.`);
+  }
+  
   const resolver = new RefResolver({
     strictMode: config.referenceResolution?.strictMode,
     validateReferenceConsistency: config.referenceResolution?.validateReferenceConsistency !== false,
     validateSchemas: config.referenceResolution?.validateSchemas !== false,
-    schemaPath: path.join(__dirname, 'template', '.vscode', 'schemas')
+    schemaPath: schemaPath
   });
   
   await resolver.loadValidationConfig(configPath);
