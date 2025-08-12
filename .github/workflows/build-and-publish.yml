@@ -257,15 +257,15 @@ jobs:
             FORCE_FLAG="--force"
           fi
           
-          # Attempt to publish
-          if npm publish $FORCE_FLAG; then
-            echo "✅ Successfully published to NPM.js"
-            return 0
-          else
-            echo "❌ Failed to publish to NPM.js"
-            echo "This might be because the package version already exists"
-            return 1
-          fi
+            # Attempt to publish
+  if npm publish $FORCE_FLAG --access public; then
+    echo "✅ Successfully published to NPM.js"
+    return 0
+  else
+    echo "❌ Failed to publish to NPM.js"
+    echo "This might be because the package version already exists"
+    return 1
+  fi
         }
         
         # Function to publish to GitHub Packages
