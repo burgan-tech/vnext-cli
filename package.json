@@ -1,11 +1,11 @@
 {
-  "name": "@amorphie/cli",
-  "version": "1.0.2",
-  "description": "CLI for creating and managing Amorphie domain projects with modular component sharing",
+  "name": "@vnext/cli",
+  "version": "1.0.0",
+  "description": "CLI for creating and managing vNext domain projects with modular component sharing",
   "main": "create.js",
   "bin": {
-    "amorphie": "./create.js",
-    "amp": "./create.js"
+    "vnext": "./create.js",
+    "vnxt": "./create.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,7 +14,7 @@
     "publish-test": "npm version patch && npm publish"
   },
   "keywords": [
-    "amorphie",
+    "vnext",
     "cli",
     "template",
     "domain",
@@ -23,7 +23,7 @@
     "modular",
     "npm-packages"
   ],
-  "author": "Amorphie Team",
+  "author": "Burgan Tech",
   "license": "MIT",
   "dependencies": {
     "ajv": "^8.12.0",
@@ -44,8 +44,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amorphie/Amorphie.Cli.git"
+    "url": "git+https://github.com/burgan-tech/vnext-cli.git"
   },
+  "bugs": {
+    "url": "https://github.com/burgan-tech/vnext-cli/issues"
+  },
+  "homepage": "https://github.com/burgan-tech/vnext-cli#readme",
   "engines": {
     "node": ">=14.0.0"
   }

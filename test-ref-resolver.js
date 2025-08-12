@@ -23,7 +23,7 @@ async function testRefResolver() {
 
     // Test 2: Parse external reference
     console.log(chalk.yellow('\n📋 Test 2: Parse External Reference'));
-    const externalRef = resolver.parseRef('@amorphie/domain-core/Tasks/task-audit-log.1.0.0.json');
+    const externalRef = resolver.parseRef('@vnext/domain-core/Tasks/task-audit-log.1.0.0.json');
     console.log('  ✅ Parsed:', JSON.stringify(externalRef, null, 2));
 
     // Test 3: Extract version from filename
@@ -113,7 +113,7 @@ async function testRefResolver() {
           "ref": "Tasks/task-example.1.0.0.json"
         },
         {
-          "ref": "@amorphie/domain-core/Tasks/task-audit.1.0.0.json"
+          "ref": "@vnext/domain-core/Tasks/task-audit.1.0.0.json"
         }
       ],
       "nested": {
@@ -167,7 +167,7 @@ async function testRefResolver() {
 
     // Test 10: Load validation config
     console.log(chalk.yellow('\n📋 Test 10: Load Validation Config'));
-    const configPath = path.join(__dirname, 'template', 'amorphie.config.json');
+    const configPath = path.join(__dirname, 'template', 'vnext.config.json');
     
     if (await fs.pathExists(configPath)) {
       try {

@@ -1,18 +1,18 @@
 /**
  * Template Repository Configuration
  * 
- * Bu dosya Amorphie CLI'nin template repository ayarlarını içerir.
+ * Bu dosya vNext CLI'nin template repository ayarlarını içerir.
  * Production ortamında bu değerler environment variable'lar ile override edilmelidir.
  */
 
 module.exports = {
   // Template Repository URL
   // Environment variable: AMORPHIE_TEMPLATE_REPO
-  templateRepo: 'https://github.com/amorphie/Amorphie.Template.git',
+  templateRepo: 'https://github.com/burgan-tech/vnext-template.git',
   
   schema: {
     npmRegistry: 'https://npm.pkg.github.com',
-    schemaPackageName: '@amorphie/schema-definitions'
+    schemaPackageName: '@vnext/schema'
   },
   
   gitToken: '',
@@ -21,14 +21,14 @@ module.exports = {
   defaultVersion: 'latest',
   
   // Template Cache Directory (relative to project root)
-  cacheDir: '.amorphie-template-cache',
+  cacheDir: '.vnext-template-cache',
   
   // Supported Version Pattern (Semantic Versioning)
   versionPattern: /^v?\d+\.\d+\.\d+$/,
   
   // Template Structure Validation
   requiredFiles: [
-    'amorphie.config.json',
+    'vnext.config.json',
     'package.json',
     '{domainName}/Tasks',
     '{domainName}/Workflows',

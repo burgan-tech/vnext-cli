@@ -14,11 +14,11 @@ All notable changes to this project will be documented in this file.
 - **Template Cache System**: Efficient local caching with version-specific storage
 
 #### New Commands
-- `amorphie template-info [--version]` - Show template information and available versions
-- `amorphie template-versions` - List all available template versions
-- `amorphie template-update` - Update template cache (clear all cached versions)
-- `amorphie template-clear` - Clear template cache completely
-- `amorphie create --list-versions` - List available template versions before creation
+- `vnext template-info [--version]` - Show template information and available versions
+- `vnext template-versions` - List all available template versions
+- `vnext template-update` - Update template cache (clear all cached versions)
+- `vnext template-clear` - Clear template cache completely
+- `vnext create --list-versions` - List available template versions before creation
 
 #### Enhanced Create Command
 - `--version <version>` - Specify template version (latest, v1.0.0, etc.)
@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
 - **Version Resolution**: Smart version resolution from Git tags
 - **Automatic Latest Detection**: Finds latest semantic version automatically
 - **Placeholder System**: Enhanced {domainName} and {packageName} replacement
-- **Cache Management**: Version-specific caching in `.amorphie-template-cache/`
+- **Cache Management**: Version-specific caching in `.vnext-template-cache/`
 
 ### 📚 Documentation
 - Complete Git-based template usage guide (`docs/git-template-usage.md`)
@@ -41,7 +41,7 @@ All notable changes to this project will be documented in this file.
 ### 🔄 Breaking Changes
 - Template location changed from local `template/` to Git repository
 - Environment variables: `AMORPHIE_TEMPLATE_REPO` and `AMORPHIE_TEMPLATE_TOKEN`
-- Cache directory: `.amorphie-template-cache/` instead of `.amorphie-cache/`
+- Cache directory: `.vnext-template-cache/` instead of `.vnext-cache/`
 
 ### 🛡️ Security
 - Built-in secure token management
@@ -79,7 +79,7 @@ All notable changes to this project will be documented in this file.
 
 1. **Update CLI**:
    ```bash
-   npm update -g @amorphie/cli
+   npm update -g @vnext/cli
    ```
 
 2. **Set Environment Variables** (optional):
@@ -90,8 +90,8 @@ All notable changes to this project will be documented in this file.
 
 3. **Test New Features**:
    ```bash
-   amorphie template-info
-   amorphie create test-project --version latest
+   vnext template-info
+   vnext create test-project --version latest
    ```
 
 4. **Migrate Existing Templates**:

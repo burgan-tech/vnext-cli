@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 async function testCLI() {
-  console.log('🚀 Testing Amorphie CLI...');
+  console.log('🚀 Testing vNext CLI...');
   
   const projectName = 'test-banking-project';
   const domainName = 'customer-management';

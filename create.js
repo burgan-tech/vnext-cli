@@ -11,14 +11,14 @@ const SchemaManager = require('./lib/schema-manager');
 const packageJson = require('./package.json');
 
 program
-  .name('amorphie')
+  .name('vnext')
   .description(packageJson.description)
   .version(packageJson.version);
 
 // Create command (existing functionality)
 program
   .command('create [project-name]')
-  .description('Create a new Amorphie domain project')
+  .description('Create a new vNext domain project')
   .option('-v, --version <version>', 'Template version to use (latest, v1.0.0, etc.)', 'latest')
   .option('--list-versions', 'List available template versions and exit')
   .option('--refresh-template', 'Force refresh template cache')
@@ -110,7 +110,7 @@ program
 │   ├── Schemas/
 │   └── Tasks/
 ├── .vscode/
-├── amorphie.config.json
+├── vnext.config.json
 ├── .cursorrules
 ├── README.md
 └── package.json
@@ -123,7 +123,7 @@ program
       console.log(chalk.yellow('\n🚀 Next steps:'));
       console.log(`  cd ${name}`);
       console.log('  npm install');
-      console.log('  amorphie validate --resolve-refs');
+      console.log('  vnext validate --resolve-refs');
       console.log('  code .');
       
     } catch (error) {
@@ -142,10 +142,10 @@ program
     try {
       console.log(chalk.blue('🔍 Validating domain components...'));
       
-      // Load amorphie.config.json
-      const configPath = path.join(process.cwd(), 'amorphie.config.json');
+      // Load vnext.config.json
+      const configPath = path.join(process.cwd(), 'vnext.config.json');
       if (!(await fs.pathExists(configPath))) {
-        console.log(chalk.red('❌ amorphie.config.json not found. Run this command in an Amorphie domain project.'));
+        console.log(chalk.red('❌ vnext.config.json not found. Run this command in an vNext domain project.'));
         process.exit(1);
       }
 
@@ -315,9 +315,9 @@ program
 
       console.log(chalk.blue(`🏗️  Building ${options.type} package...`));
       
-      const configPath = path.join(process.cwd(), 'amorphie.config.json');
+      const configPath = path.join(process.cwd(), 'vnext.config.json');
       if (!(await fs.pathExists(configPath))) {
-        console.log(chalk.red('❌ amorphie.config.json not found.'));
+        console.log(chalk.red('❌ vnext.config.json not found.'));
         process.exit(1);
       }
 
@@ -396,7 +396,7 @@ program
       await fs.ensureDir(outputDir);
 
       // Step 3: Prepare and copy configuration files with build type modifications
-      await fs.writeJSON(path.join(outputDir, 'amorphie.config.json'), config, { spaces: 2 });
+      await fs.writeJSON(path.join(outputDir, 'vnext.config.json'), config, { spaces: 2 });
       
       const packagePath = path.join(process.cwd(), 'package.json');
       if (await fs.pathExists(packagePath)) {
@@ -413,8 +413,8 @@ program
         }
         
         // Add build type metadata
-        packageJson.amorphie = {
-          ...packageJson.amorphie,
+        packageJson.vnext = {
+          ...packageJson.vnext,
           buildType: options.type,
           buildTimestamp: new Date().toISOString(),
           originalPackage: originalPackageName
@@ -655,9 +655,9 @@ program
         // List exports from current project
         console.log(chalk.blue('📋 Listing exports from current project...'));
         
-        const configPath = path.join(process.cwd(), 'amorphie.config.json');
+        const configPath = path.join(process.cwd(), 'vnext.config.json');
         if (!(await fs.pathExists(configPath))) {
-          console.log(chalk.red('❌ amorphie.config.json not found.'));
+          console.log(chalk.red('❌ vnext.config.json not found.'));
           process.exit(1);
         }
 
@@ -912,9 +912,9 @@ program
     try {
       console.log(chalk.blue('🗺️  Generating domain boundary visualization...'));
       
-      const configPath = path.join(process.cwd(), 'amorphie.config.json');
+      const configPath = path.join(process.cwd(), 'vnext.config.json');
       if (!(await fs.pathExists(configPath))) {
-        console.log(chalk.red('❌ amorphie.config.json not found.'));
+        console.log(chalk.red('❌ vnext.config.json not found.'));
         process.exit(1);
       }
 
@@ -1216,9 +1216,9 @@ async function resolveReferencesToPayload(obj, resolver, currentDomain) {
  * @returns {Promise<void>}
  */
 async function buildPackage(outputDir, type = 'reference') {
-  const configPath = path.join(process.cwd(), 'amorphie.config.json');
+  const configPath = path.join(process.cwd(), 'vnext.config.json');
   if (!(await fs.pathExists(configPath))) {
-    throw new Error('amorphie.config.json not found');
+    throw new Error('vnext.config.json not found');
   }
 
   const config = await fs.readJSON(configPath);
@@ -1261,7 +1261,7 @@ async function buildPackage(outputDir, type = 'reference') {
   await fs.ensureDir(fullOutputDir);
   
   // Copy configuration
-  await fs.writeJSON(path.join(fullOutputDir, 'amorphie.config.json'), config, { spaces: 2 });
+  await fs.writeJSON(path.join(fullOutputDir, 'vnext.config.json'), config, { spaces: 2 });
   
   const packagePath = path.join(process.cwd(), 'package.json');
   if (await fs.pathExists(packagePath)) {
@@ -1278,8 +1278,8 @@ async function buildPackage(outputDir, type = 'reference') {
     }
     
     // Add build type metadata
-    packageJson.amorphie = {
-      ...packageJson.amorphie,
+    packageJson.vnext = {
+      ...packageJson.vnext,
       buildType: type,
       buildTimestamp: new Date().toISOString(),
       originalPackage: originalPackageName
