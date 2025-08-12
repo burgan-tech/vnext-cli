@@ -403,7 +403,7 @@ jobs:
         echo "## 📦 NPM Package Publishing Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Version Information" >> $GITHUB_STEP_SUMMARY
-        echo "- **Package**: \`@vnext/cli\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Package**: \`@burgan-tech/vnext-cli\`" >> $GITHUB_STEP_SUMMARY
         echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
@@ -437,17 +437,17 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "#### Global Installation" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "npm install -g @vnext/cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "npm install -g @burgan-tech/vnext-cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "#### Project Installation" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "npm install @vnext/cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "npm install @burgan-tech/vnext-cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "#### Using npx (no installation required)" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "npx @vnext/cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "npx @burgan-tech/vnext-cli@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
         else
@@ -457,13 +457,13 @@ jobs:
         fi
         
         echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
-        echo "- [NPM Package](https://www.npmjs.com/package/@vnext/cli)" >> $GITHUB_STEP_SUMMARY
+        echo "- [NPM Package](https://www.npmjs.com/package/@burgan-tech/vnext-cli)" >> $GITHUB_STEP_SUMMARY
         echo "- [GitHub Repository](https://github.com/${{ github.repository }})" >> $GITHUB_STEP_SUMMARY
         echo "- [Workflow Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
         echo "- [Package Documentation](https://github.com/${{ github.repository }}#readme)" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📋 Next Steps" >> $GITHUB_STEP_SUMMARY
         echo "1. Package will be available on NPM (may take a few minutes to appear in search)" >> $GITHUB_STEP_SUMMARY
-        echo "2. Install and use the CLI: \`npm install -g @vnext/cli\`" >> $GITHUB_STEP_SUMMARY
+        echo "2. Install and use the CLI: \`npm install -g @burgan-tech/vnext-cli\`" >> $GITHUB_STEP_SUMMARY
         echo "3. View package details and download statistics on NPM" >> $GITHUB_STEP_SUMMARY
         echo "4. Update documentation if needed" >> $GITHUB_STEP_SUMMARY

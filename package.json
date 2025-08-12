@@ -1,5 +1,5 @@
 {
-  "name": "@vnext/cli",
+  "name": "@burgan-tech/vnext-cli",
   "version": "1.0.0",
   "description": "CLI for creating and managing vNext domain projects with modular component sharing",
   "main": "create.js",
