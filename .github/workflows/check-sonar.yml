@@ -1,9 +1,8 @@
 name: SonarQube Analysis
 on:
-  push:
-    branches:
-      - master
-      - 'release-v*'
+  pull_request:
+    branches: [ master, 'release-v*']
+    types: [opened, synchronize, reopened]
 
 jobs:
   sonar:
