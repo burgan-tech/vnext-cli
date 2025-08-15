@@ -19,7 +19,7 @@ CLI for creating and managing vNext domain projects with modular component shari
 ## 📦 Installation
 
 ```bash
-npm install -g @vnext/cli
+npm install -g @burgan-tech/vnext-cli
 ```
 
 ## 🔧 Quick Start
@@ -194,7 +194,7 @@ Projects use `runtimeVersion` in `vnext.config.json` to determine which schema p
 
 ### Schema Package Management
 
-- **Package Source**: NPM registry (`@vnext/schema` by default)
+- **Package Source**: NPM registry (`@burgan-tech/vnext-schema` by default)
 - **Version Binding**: Each `runtimeVersion` maps to specific schema definitions
 - **Cache System**: Downloaded schemas cached locally per version
 - **No Fallback**: NPM access required - no local schema fallback

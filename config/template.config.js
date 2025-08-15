@@ -6,16 +6,16 @@
  */
 
 module.exports = {
-  // Template Repository URL
-  // Environment variable: AMORPHIE_TEMPLATE_REPO
-  templateRepo: 'https://github.com/burgan-tech/vnext-template.git',
-  
-  schema: {
-    npmRegistry: 'https://npm.pkg.github.com',
-    schemaPackageName: '@vnext/schema'
+  // Template NPM Package Configuration
+  template: {
+    npmRegistry: 'https://registry.npmjs.org',
+    packageName: '@burgan-tech/vnext-template'
   },
   
-  gitToken: '',
+  schema: {
+    npmRegistry: 'https://registry.npmjs.org',
+    schemaPackageName: '@burgan-tech/vnext-schema'
+  },
   
   // Default Template Version
   defaultVersion: 'latest',

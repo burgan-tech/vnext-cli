@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit AI Configuration for vnext-cli
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+# Language settings
+language: en-US
+
+# Review settings
+reviews:
+  # Enable reviews on all branches, not just the default branch
+  review_status: true
+  # Enable auto reviews on all target branches
+  auto_review:
+    enabled: true
+    # Review all branches including non-default ones
+    base_branches:
+      - master
+      - main
+      - develop
+      - "release-v*"
+      - "feature/*"
+      - "hotfix/*"
+      - "bugfix/*"
+  # Request changes threshold
+  request_changes_workflow: false
+
+# What to review
+review:
+  # Enable review of different file types for Node.js CLI project
+  include_patterns:
+    - "**/*.js"
+    - "**/*.mjs"
+    - "**/*.ts"
+    - "**/*.json"
+    - "**/*.yml"
+    - "**/*.yaml"
+    - "**/*.md"
+    - "**/*.sh"
+    - "**/package.json"
+    - "**/package-lock.json"
+    - "**/.gitignore"
+    - "**/Dockerfile"
+  
+  # Skip certain files/directories
+  exclude_patterns:
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/.cache/**"
+    - "**/coverage/**"
+    - "**/*.log"
+    - "**/tmp/**"
+    - "**/temp/**"
+    - "**/.env*"
+    - "**/package-lock.json"
+
+# Chat settings
+chat:
+  # Enable chat functionality
+  auto_reply: false
+
+# Early access features
+early_access: true
