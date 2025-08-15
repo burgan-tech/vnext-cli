@@ -4,10 +4,6 @@ on:
     branches:
       - master
       - 'release-v*'
-  pull_request:
-    branches:
-      - master
-      - 'release-v*'
 
 jobs:
   sonar:
@@ -41,7 +37,19 @@ jobs:
           sonar-scanner \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.branch.name=${{ github.ref_name }} \
+            -Dsonar.projectKey=burgan-tech_vnext-cli \
+            -Dsonar.organization=burgan-tech \
+            -Dsonar.projectName="vNext CLI" \
+            -Dsonar.projectVersion=1.0.0 \
+            -Dsonar.sources=. \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.exclusions="**/node_modules/**,**/coverage/**,**/dist/**,**/build/**,**/*.min.js,**/test/**,**/tests/**" \
+            -Dsonar.test.exclusions="**/node_modules/**,**/test/**,**/tests/**,**/*.test.js,**/*.spec.js" \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.testExecutionReportPaths=coverage/test-reporter.xml \
+            -Dsonar.coverage.exclusions="**/test/**,**/tests/**,**/*.test.js,**/*.spec.js,**/coverage/**" \
+            -Dsonar.cpd.exclusions="**/test/**,**/tests/**"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
