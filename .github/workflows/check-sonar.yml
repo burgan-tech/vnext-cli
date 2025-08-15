@@ -33,15 +33,14 @@ jobs:
           npm test -- --coverage || echo "No tests configured yet"
         continue-on-error: true
 
-      - name: SonarQube Scan
-        uses: sonarqube/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+      - name: Setup SonarQube Scanner
+        uses: warchant/setup-sonar-scanner@v7
 
-      - name: SonarQube Quality Gate Check
-        uses: sonarqube/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
+      - name: SonarQube Scan
+        run: |
+          sonar-scanner \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+
