@@ -18,6 +18,7 @@ reviews:
       - main
       - develop
       - "release-v*"
+      - "release/*"
       - "feature/*"
       - "hotfix/*"
       - "bugfix/*"
